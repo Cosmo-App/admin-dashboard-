@@ -1,65 +1,160 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import React from "react";
+import DashboardLayout from "@/components/DashboardLayout";
+import MetricCard from "@/components/MetricCard";
+import {
+  UserGrowthChart,
+  FilmUploadsChart,
+  GenreDistributionChart,
+} from "@/components/Charts";
+import ActivityFeed from "@/components/ActivityFeed";
+import PopularFilmsList from "@/components/PopularFilmsList";
+import {
+  useMetrics,
+  useUserGrowth,
+  useFilmUploads,
+  useGenreDistribution,
+  useRecentActivities,
+  usePopularFilms,
+} from "@/hooks/useMetrics";
+import { Users, Film, UserCircle, List, Clock, TrendingUp } from "lucide-react";
+import { RefreshCw } from "lucide-react";
+
+export default function HomePage() {
+  const { metrics, isLoading: metricsLoading, refetch: refetchMetrics } = useMetrics({
+    autoFetch: true,
+    interval: 60000, // Refresh every minute
+  });
+  const { data: userGrowthData, isLoading: userGrowthLoading } = useUserGrowth(30);
+  const { data: filmUploadsData, isLoading: filmUploadsLoading } = useFilmUploads(6);
+  const { data: genreData, isLoading: genreLoading } = useGenreDistribution();
+  const { activities, isLoading: activitiesLoading } = useRecentActivities(10);
+  const { films: popularFilms, isLoading: popularFilmsLoading } = usePopularFilms(10);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <DashboardLayout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-white text-3xl font-bold mb-2">Dashboard Overview</h1>
+            <p className="text-gray-400 text-sm">
+              Monitor your platform's performance and user activity
+            </p>
+          </div>
+          <button
+            onClick={refetchMetrics}
+            className="flex items-center gap-2 px-4 py-2 bg-secondary hover:bg-secondary/80 text-white rounded-lg transition-colors"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <RefreshCw className="w-4 h-4" />
+            <span className="text-sm font-medium">Refresh</span>
+          </button>
         </div>
-      </main>
-    </div>
+
+        {/* Overview Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <MetricCard
+            title="Total Users"
+            value={metrics?.totals.users || 0}
+            change={metrics?.growth.users}
+            icon={Users}
+            format="compact"
+            isLoading={metricsLoading}
+          />
+          <MetricCard
+            title="Total Films"
+            value={metrics?.totals.films || 0}
+            change={metrics?.growth.films}
+            icon={Film}
+            format="compact"
+            isLoading={metricsLoading}
+          />
+          <MetricCard
+            title="Total Creators"
+            value={metrics?.totals.creators || 0}
+            change={metrics?.growth.creators}
+            icon={UserCircle}
+            format="compact"
+            isLoading={metricsLoading}
+          />
+          <MetricCard
+            title="Total Playlists"
+            value={metrics?.totals.playlists || 0}
+            change={metrics?.growth.playlists}
+            icon={List}
+            format="compact"
+            isLoading={metricsLoading}
+          />
+        </div>
+
+        {/* Additional Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <MetricCard
+            title="Total Watch Time"
+            value={metrics?.watchTime.totalHours || 0}
+            icon={Clock}
+            format="time"
+            suffix="hrs"
+            isLoading={metricsLoading}
+          />
+          <MetricCard
+            title="Avg. Watch Time/User"
+            value={metrics?.watchTime.avgMinutesPerUser || 0}
+            icon={TrendingUp}
+            format="time"
+            suffix="min"
+            isLoading={metricsLoading}
+          />
+          <MetricCard
+            title="Active Users (30d)"
+            value={metrics?.activeUsers || 0}
+            icon={Users}
+            format="compact"
+            isLoading={metricsLoading}
+          />
+        </div>
+
+        {/* Charts Row 1 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* User Growth Chart */}
+          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-6">
+            <h3 className="text-white text-lg font-semibold mb-4">User Growth (30 days)</h3>
+            <UserGrowthChart data={userGrowthData} isLoading={userGrowthLoading} height={300} />
+          </div>
+
+          {/* Film Uploads Chart */}
+          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-6">
+            <h3 className="text-white text-lg font-semibold mb-4">Film Uploads (6 months)</h3>
+            <FilmUploadsChart data={filmUploadsData} isLoading={filmUploadsLoading} height={300} />
+          </div>
+        </div>
+
+        {/* Charts Row 2 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Genre Distribution */}
+          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-6">
+            <h3 className="text-white text-lg font-semibold mb-4">Genre Distribution</h3>
+            <GenreDistributionChart data={genreData} isLoading={genreLoading} height={300} />
+          </div>
+
+          {/* Popular Films */}
+          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-6">
+            <h3 className="text-white text-lg font-semibold mb-4">Top Films</h3>
+            <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
+              <PopularFilmsList films={popularFilms} isLoading={popularFilmsLoading} limit={10} />
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-6">
+          <h3 className="text-white text-lg font-semibold mb-4">Recent Activity</h3>
+          <div className="max-h-[500px] overflow-y-auto custom-scrollbar">
+            <ActivityFeed activities={activities} isLoading={activitiesLoading} limit={20} />
+          </div>
+        </div>
+      </div>
+    </DashboardLayout>
   );
 }
