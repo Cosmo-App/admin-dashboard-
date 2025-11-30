@@ -100,55 +100,72 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 z-40 h-screen bg-black border-r border-secondary transition-all duration-300",
-        isCollapsed ? "w-16" : "w-64"
+        "fixed left-0 top-0 z-40 h-screen bg-black border-r border-border transition-all duration-300 ease-in-out",
+        "flex flex-col",
+        isCollapsed ? "w-20" : "w-72",
+        "hidden lg:flex"
       )}
     >
-      {/* Logo */}
-      <div className="flex h-16 items-center justify-between px-4 border-b border-secondary">
-        {!isCollapsed && (
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-lg">C</span>
-            </div>
-            <span className="text-white font-bold text-xl">Cosmic</span>
-          </Link>
-        )}
+      {/* Logo & Toggle */}
+      <div className="flex h-20 items-center justify-between px-5 border-b border-border flex-shrink-0">
+        <Link 
+          href="/" 
+          className={cn(
+            "flex items-center gap-3 transition-opacity duration-200",
+            isCollapsed && "opacity-0 w-0"
+          )}
+        >
+          <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 flex-shrink-0">
+            <span className="text-white font-bold text-xl">C</span>
+          </div>
+          {!isCollapsed && (
+            <span className="text-white font-bold text-2xl tracking-tight">Cosmic</span>
+          )}
+        </Link>
         <button
           onClick={onToggle}
-          className="p-2 hover:bg-secondary rounded-lg transition-colors"
+          className={cn(
+            "p-2.5 hover:bg-secondary rounded-xl transition-all duration-200 group",
+            isCollapsed && "mx-auto"
+          )}
           aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {isCollapsed ? (
-            <ChevronRight className="w-5 h-5 text-white" />
+            <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
           ) : (
-            <ChevronLeft className="w-5 h-5 text-white" />
+            <ChevronLeft className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
           )}
         </button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex flex-col gap-1 p-3 mt-4">
+      <nav className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-1">
         {filteredNavItems.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href;
+          const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
 
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
+                "flex items-center gap-3.5 px-4 py-3.5 rounded-xl transition-all duration-200 group relative",
                 isActive
-                  ? "bg-primary text-white"
+                  ? "bg-gradient-to-r from-primary to-primary/90 text-white shadow-lg shadow-primary/20"
                   : "text-gray-400 hover:bg-secondary hover:text-white",
-                isCollapsed && "justify-center"
+                isCollapsed && "justify-center px-0"
               )}
               title={isCollapsed ? item.label : undefined}
             >
-              <Icon className={cn("w-5 h-5 flex-shrink-0")} />
+              <Icon className={cn(
+                "flex-shrink-0 transition-transform duration-200",
+                isActive ? "w-5 h-5" : "w-5 h-5 group-hover:scale-110"
+              )} />
               {!isCollapsed && (
-                <span className="font-medium text-sm">{item.label}</span>
+                <span className="font-semibold text-sm tracking-wide">{item.label}</span>
+              )}
+              {isActive && !isCollapsed && (
+                <div className="absolute right-4 w-1.5 h-1.5 bg-white rounded-full animate-pulse-soft" />
               )}
             </Link>
           );
@@ -156,18 +173,26 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       </nav>
 
       {/* Admin Info */}
-      {!isCollapsed && admin && (
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-secondary">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-white font-medium">
+      {admin && (
+        <div className={cn(
+          "border-t border-border p-4 flex-shrink-0",
+          isCollapsed && "px-2"
+        )}>
+          <div className={cn(
+            "flex items-center gap-3 p-3 rounded-xl bg-secondary/50 hover:bg-secondary transition-all duration-200",
+            isCollapsed && "justify-center p-2"
+          )}>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-lg flex-shrink-0">
               {admin.name?.charAt(0).toUpperCase()}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-white text-sm font-medium truncate">{admin.name}</p>
-              <p className="text-gray-400 text-xs truncate">
-                {admin.assignedRoleId?.name || "Admin"}
-              </p>
-            </div>
+            {!isCollapsed && (
+              <div className="flex-1 min-w-0">
+                <p className="text-white text-sm font-semibold truncate">{admin.name}</p>
+                <p className="text-gray-400 text-xs truncate mt-0.5">
+                  {admin.assignedRoleId?.name || "Admin"}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}
