@@ -3,16 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
-  // Optimize for production and reduce bundle size
+  // Optimize for production
   compress: true,
   poweredByHeader: false,
-  // Externalize large dependencies to reduce Worker bundle
-  experimental: {
-    serverComponentsExternalPackages: [
-      'axios',
-      'date-fns',
-    ],
-  },
   images: {
     remotePatterns: [
       {
@@ -33,7 +26,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'res.cloudflare.com',
+        hostname: 'res.cloudinary.com',
       },
       {
         protocol: 'http',
