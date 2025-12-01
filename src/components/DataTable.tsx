@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface Column<T> {
+export interface Column<T> {
   key: string;
   label: string;
   sortable?: boolean;

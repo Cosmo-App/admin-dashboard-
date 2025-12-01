@@ -21,9 +21,9 @@ export default function ProfilePage() {
   const fetchProfile = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get("/v2/auth/admin/session");
+      const response = await api.get<Admin | { admin: Admin }>("/v2/auth/admin/session");
       // Handle both response.data and response.data.admin structures
-      const adminData = response.data?.admin || response.data;
+      const adminData = (response.data as any)?.admin || response.data;
       setAdmin(adminData as Admin);
     } catch (error) {
       console.error("Failed to fetch profile:", error);

@@ -367,6 +367,7 @@ export default function PlaylistsPage() {
           <DataTable
             data={filteredPlaylists}
             columns={columns}
+            keyField="playlistId"
             actions={renderActions}
             isLoading={isLoading}
             emptyMessage="No playlists found"
