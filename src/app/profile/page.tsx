@@ -21,8 +21,10 @@ export default function ProfilePage() {
   const fetchProfile = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get<Admin>("/v2/auth/admin/session");
-      setAdmin(response.data as Admin);
+      const response = await api.get("/v2/auth/admin/session");
+      // Handle both response.data and response.data.admin structures
+      const adminData = response.data?.admin || response.data;
+      setAdmin(adminData as Admin);
     } catch (error) {
       console.error("Failed to fetch profile:", error);
     } finally {
@@ -144,13 +146,13 @@ export default function ProfilePage() {
                 <div className="flex items-start justify-between py-3 border-b border-secondary">
                   <span className="text-gray-400 text-sm">Last Login</span>
                   <span className="text-white text-sm font-medium">
-                    {admin.lastLogin ? formatDateFull(new Date(admin.lastLogin)) : "Never"}
+                    {admin.lastLogin ? formatDateFull(admin.lastLogin) : "Never"}
                   </span>
                 </div>
                 <div className="flex items-start justify-between py-3">
                   <span className="text-gray-400 text-sm">Account Created</span>
                   <span className="text-white text-sm font-medium">
-                    {formatDateFull(new Date(admin.createdAt))}
+                    {admin.createdAt ? formatDateFull(admin.createdAt) : "N/A"}
                   </span>
                 </div>
               </div>

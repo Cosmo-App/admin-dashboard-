@@ -3,6 +3,7 @@
 import React from "react";
 import { Upload, X, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
 
 interface ImageUploadProps {
   value?: string;
@@ -49,25 +50,31 @@ export default function ImageUpload({
     setError(null);
 
     try {
-      // For now, create a local URL (in production, upload to Cloudinary/S3)
-      const imageUrl = URL.createObjectURL(file);
-      onChange(imageUrl);
-
-      // TODO: Implement actual upload to Cloudinary/S3
-      // const formData = new FormData();
-      // formData.append('file', file);
-      // const response = await api.upload('/upload/image', formData);
-      // onChange(response.data.url);
+      // Upload to backend
+      const formData = new FormData();
+      formData.append("image", file);
+      
+      const response = await api.upload<{ imageUrl: string }>(
+        "/v2/auth/admin/profile-picture",
+        formData
+      );
+      
+      if (response.data?.imageUrl) {
+        onChange(response.data.imageUrl);
+      } else {
+        throw new Error("No image URL returned from server");
+      }
     } catch (err: any) {
       console.error("Upload error:", err);
-      setError(err.message || "Failed to upload image");
+      setError(err?.message || "Failed to upload image");
     } finally {
       setIsUploading(false);
     }
   };
 
   const handleRemove = () => {
-    if (value) {
+    // Only revoke blob URLs, not external URLs
+    if (value && value.startsWith("blob:")) {
       URL.revokeObjectURL(value);
     }
     onRemove?.();

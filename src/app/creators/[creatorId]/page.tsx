@@ -88,7 +88,7 @@ export default function ViewCreatorPage() {
       key: "createdAt",
       label: "Upload Date",
       sortable: true,
-      render: (film: Film) => formatDateShort(new Date(film.createdAt)),
+      render: (film: Film) => formatDateShort(film.createdAt),
     },
     {
       key: "actions",
@@ -123,7 +123,7 @@ export default function ViewCreatorPage() {
             <div>
               <h1 className="text-white text-3xl font-bold">{creator.name}</h1>
               <p className="text-gray-400 text-sm mt-1">
-                Joined {formatDateFull(new Date(creator.createdAt))}
+                Joined {formatDateFull(creator.createdAt)}
               </p>
             </div>
           </div>
@@ -226,7 +226,7 @@ export default function ViewCreatorPage() {
                 <div className="flex items-start justify-between py-2 border-b border-secondary">
                   <span className="text-gray-400 text-sm">Joined Date</span>
                   <span className="text-white text-sm font-medium">
-                    {formatDateFull(new Date(creator.createdAt))}
+                    {formatDateFull(creator.createdAt)}
                   </span>
                 </div>
                 <div className="flex items-start justify-between py-2">

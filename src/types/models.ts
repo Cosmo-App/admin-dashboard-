@@ -48,6 +48,8 @@ export interface Creator {
   description?: string;
   yearsOfExperience?: number;
   isActive?: boolean;
+  filmsCount?: number;
+  totalViews?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -65,7 +67,8 @@ export interface Film {
   logline?: string;
   production?: string;
   starring?: string[];
-  creatorId?: string | Creator;
+  creatorId?: string;
+  creator?: Creator;
   genre?: string;
   rating?: string;
   views?: string;
@@ -75,6 +78,7 @@ export interface Film {
   duration?: number;
   releaseYear?: number;
   tags?: string[];
+  isActive?: boolean;
   // Legacy fields
   name?: string;
   description?: string;
@@ -139,12 +143,16 @@ export interface AdminSession {
 
 export interface Playlist {
   _id: string;
+  playlistId: string;
   name: string;
   description?: string;
   userId: string;
+  ownerName?: string; // Populated by backend for admin views
   films: string[];
-  shareCode: string;
+  shareCode?: string | null;
   isPublic: boolean;
+  coverImage?: string;
+  views?: number;
   createdAt: string;
   updatedAt: string;
 }

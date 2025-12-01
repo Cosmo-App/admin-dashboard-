@@ -36,7 +36,7 @@ export default function Header() {
       <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo (Mobile) */}
         <div className="flex items-center gap-4 lg:hidden">
-          <div className="w-10 h-10 bg-linear-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+          <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
             <span className="text-white font-bold text-xl">C</span>
           </div>
           <span className="text-white font-bold text-xl tracking-tight">Cosmic</span>
@@ -67,7 +67,7 @@ export default function Header() {
               onClick={() => setShowDropdown(!showDropdown)}
               className="flex items-center gap-2 sm:gap-3 p-2 sm:px-3 sm:py-2 hover:bg-secondary rounded-xl transition-all duration-200 group"
             >
-              <div className="w-9 h-9 rounded-xl bg-linear-to-br from-primary/20 to-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-base">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-base">
                 {admin?.name?.charAt(0).toUpperCase()}
               </div>
               <div className="hidden sm:block text-left">

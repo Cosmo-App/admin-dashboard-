@@ -11,6 +11,7 @@ import { api } from "@/lib/api";
 import { ArrowLeft, Save } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 
 const adminSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -27,6 +28,7 @@ export default function CreateAdminPage() {
   const [profilePicture, setProfilePicture] = useState<string>("");
   const router = useRouter();
   const { admin: currentAdmin } = useAuth();
+  const toast = useToast();
 
   const isSuperAdmin = currentAdmin?.role === "SUPERADMIN";
 
@@ -55,10 +57,11 @@ export default function CreateAdminPage() {
         ...data,
         profilePicture: profilePicture || undefined,
       });
+      toast.success("Admin created successfully!");
       router.push("/admins");
     } catch (error: any) {
       console.error("Failed to create admin:", error);
-      alert(error.response?.data?.error || "Failed to create admin");
+      toast.error(error.response?.data?.error || "Failed to create admin");
     } finally {
       setIsSubmitting(false);
     }

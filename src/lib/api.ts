@@ -120,6 +120,14 @@ export async function put<T>(url: string, data?: any): Promise<ApiResponse<T>> {
 }
 
 /**
+ * Generic PATCH request
+ */
+export async function patch<T>(url: string, data?: any): Promise<ApiResponse<T>> {
+  const response = await apiClient.patch<ApiResponse<T>>(url, data);
+  return response.data;
+}
+
+/**
  * Generic DELETE request
  */
 export async function del<T>(url: string): Promise<ApiResponse<T>> {
@@ -169,6 +177,7 @@ export const api = {
   get,
   post,
   put,
+  patch,
   del,
   upload,
   download,

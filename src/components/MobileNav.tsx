@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   Menu,
@@ -60,9 +61,13 @@ export default function MobileNav() {
   const hasPermission = (item: NavItem): boolean => {
     if (!admin) return false;
     if (item.requiredRoles?.length) {
-      const roleName = typeof admin.assignedRoleId === 'string' 
-        ? admin.assignedRoleId 
-        : admin.assignedRoleId?.name || '';
+      // Get role name from admin.role (string) or admin.assignedRoleId (object or string)
+      let roleName = admin.role;
+      if (!roleName) {
+        roleName = typeof admin.assignedRoleId === 'string' 
+          ? admin.assignedRoleId 
+          : admin.assignedRoleId?.name || '';
+      }
       return item.requiredRoles.includes(roleName);
     }
     return true;
@@ -79,7 +84,8 @@ export default function MobileNav() {
   };
 
   const getRoleName = () => {
-    if (!admin?.assignedRoleId) return 'Admin';
+    if (!admin?.assignedRoleId && !admin?.role) return 'Admin';
+    if (admin.role) return admin.role;
     return typeof admin.assignedRoleId === 'string' 
       ? admin.assignedRoleId 
       : admin.assignedRoleId.name;
@@ -91,7 +97,7 @@ export default function MobileNav() {
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 h-16 bg-black/80 backdrop-blur-xl border-b border-border">
         <div className="flex h-full items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-10 h-10 bg-linear-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+            <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
               <span className="text-white font-bold text-xl">C</span>
             </div>
             <span className="text-white font-bold text-xl tracking-tight">Cosmic</span>
@@ -130,8 +136,20 @@ export default function MobileNav() {
         {admin && (
           <div className="p-6 border-b border-border shrink-0">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-xl bg-linear-to-br from-primary/20 to-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-xl shrink-0">
-                {admin.name?.charAt(0).toUpperCase()}
+              <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/20 flex items-center justify-center">
+                {admin.profilePicture ? (
+                  <Image
+                    src={admin.profilePicture}
+                    alt={admin.name || "Admin"}
+                    width={56}
+                    height={56}
+                    className="object-cover w-full h-full"
+                  />
+                ) : (
+                  <span className="text-primary font-bold text-xl">
+                    {admin.name?.charAt(0).toUpperCase()}
+                  </span>
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-white text-base font-semibold truncate">{admin.name}</p>
@@ -158,7 +176,7 @@ export default function MobileNav() {
                 className={cn(
                   "flex items-center gap-3.5 px-4 py-3.5 rounded-xl transition-all duration-200 group",
                   isActive
-                    ? "bg-linear-to-r from-primary to-primary/90 text-white shadow-lg shadow-primary/20"
+                    ? "bg-gradient-to-r from-primary to-primary/90 text-white shadow-lg shadow-primary/20"
                     : "text-gray-400 hover:bg-secondary-hover hover:text-white"
                 )}
               >

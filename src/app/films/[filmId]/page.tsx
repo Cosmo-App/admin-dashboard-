@@ -78,7 +78,7 @@ export default function ViewFilmPage() {
             <div>
               <h1 className="text-white text-3xl font-bold">{film.title}</h1>
               <p className="text-gray-400 text-sm mt-1">
-                {film.genre} • {formatDateFull(new Date(film.createdAt))}
+                {film.genre} • {formatDateFull(film.createdAt)}
               </p>
             </div>
           </div>
@@ -171,11 +171,21 @@ export default function ViewFilmPage() {
               <div className="space-y-3">
                 <div className="flex items-start justify-between py-2 border-b border-secondary">
                   <span className="text-gray-400 text-sm">Creator</span>
-                  <span className="text-white text-sm font-medium">
-                    {typeof film.creatorId === 'string' 
-                      ? film.creatorId 
-                      : film.creatorId?.name || "Unknown"}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {film.creator?.profilePicture && (
+                      <div className="w-5 h-5 rounded-full overflow-hidden relative">
+                        <Image 
+                          src={film.creator.profilePicture} 
+                          alt={film.creator.name} 
+                          fill 
+                          className="object-cover" 
+                        />
+                      </div>
+                    )}
+                    <span className="text-white text-sm font-medium">
+                      {film.creator?.name || "Unknown Creator"}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex items-start justify-between py-2 border-b border-secondary">
                   <span className="text-gray-400 text-sm">Genre</span>
@@ -184,7 +194,7 @@ export default function ViewFilmPage() {
                 <div className="flex items-start justify-between py-2 border-b border-secondary">
                   <span className="text-gray-400 text-sm">Upload Date</span>
                   <span className="text-white text-sm font-medium">
-                    {formatDateFull(new Date(film.createdAt))}
+                    {formatDateFull(film.createdAt)}
                   </span>
                 </div>
                 <div className="flex items-start justify-between py-2">

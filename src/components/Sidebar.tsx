@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -71,16 +72,27 @@ const navItems: NavItem[] = [
 
 export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
-  const { admin } = useAuth();
+  const { admin, isLoading } = useAuth();
 
   const hasPermission = (item: NavItem): boolean => {
-    if (!admin) return false;
+    // Always show basic nav items during loading
+    if (isLoading) return true;
+    
+    // When not loading and no admin, hide items requiring specific permissions
+    if (!admin) {
+      // Show items that don't require specific roles/permissions
+      return !item.requiredRoles && !item.requiredPermissions;
+    }
 
     // Check role requirements
     if (item.requiredRoles?.length) {
-      const roleName = typeof admin.assignedRoleId === 'string' 
-        ? admin.assignedRoleId 
-        : admin.assignedRoleId?.name || "";
+      // Get role name from admin.role (string) or admin.assignedRoleId (object or string)
+      let roleName = admin.role;
+      if (!roleName) {
+        roleName = typeof admin.assignedRoleId === 'string' 
+          ? admin.assignedRoleId 
+          : admin.assignedRoleId?.name || "";
+      }
       const hasRole = item.requiredRoles.includes(roleName);
       if (!hasRole) return false;
     }
@@ -100,7 +112,8 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
     return true;
   };
 
-  const filteredNavItems = navItems.filter(hasPermission);
+  // Show all items during loading, or filter by permissions when loaded
+  const filteredNavItems = isLoading ? navItems : navItems.filter(hasPermission);
 
   return (
     <aside
@@ -120,7 +133,7 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
             isCollapsed && "opacity-0 w-0"
           )}
         >
-          <div className="w-10 h-10 bg-linear-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 shrink-0">
+          <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 shrink-0">
             <span className="text-white font-bold text-xl">C</span>
           </div>
           {!isCollapsed && (
@@ -156,7 +169,7 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
               className={cn(
                 "flex items-center gap-3.5 px-4 py-3.5 rounded-xl transition-all duration-200 group relative",
                 isActive
-                  ? "bg-linear-to-r from-primary to-primary/90 text-white shadow-lg shadow-primary/20"
+                  ? "bg-gradient-to-r from-primary to-primary/90 text-white shadow-lg shadow-primary/20"
                   : "text-gray-400 hover:bg-secondary hover:text-white",
                 isCollapsed && "justify-center px-0"
               )}
@@ -187,16 +200,28 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
             "flex items-center gap-3 p-3 rounded-xl bg-secondary/50 hover:bg-secondary transition-all duration-200",
             isCollapsed && "justify-center p-2"
           )}>
-            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-primary/20 to-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-lg shrink-0">
-              {admin.name?.charAt(0).toUpperCase()}
+            <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/20 flex items-center justify-center">
+              {admin.profilePicture ? (
+                <Image
+                  src={admin.profilePicture}
+                  alt={admin.name || "Admin"}
+                  width={40}
+                  height={40}
+                  className="object-cover w-full h-full"
+                />
+              ) : (
+                <span className="text-primary font-bold text-lg">
+                  {admin.name?.charAt(0).toUpperCase()}
+                </span>
+              )}
             </div>
             {!isCollapsed && (
               <div className="flex-1 min-w-0">
                 <p className="text-white text-sm font-semibold truncate">{admin.name}</p>
                 <p className="text-gray-400 text-xs truncate mt-0.5">
-                  {typeof admin.assignedRoleId === 'string' 
+                  {admin.role || (typeof admin.assignedRoleId === 'string' 
                     ? admin.assignedRoleId 
-                    : admin.assignedRoleId?.name || "Admin"}
+                    : admin.assignedRoleId?.name || "Admin")}
                 </p>
               </div>
             )}

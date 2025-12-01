@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { SESSION_COOKIE_NAME } from "@/lib/constants";
 
 // Routes that don't require authentication
-const publicRoutes = ["/login"];
+const publicRoutes = ["/login", "/creator/login", "/creator/register"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

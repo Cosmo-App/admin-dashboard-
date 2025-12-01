@@ -7,9 +7,10 @@ import DataTable from "@/components/DataTable";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { api } from "@/lib/api";
 import { Film } from "@/types/models";
-import { Plus, Eye, Edit, Trash, Film as FilmIcon } from "lucide-react";
+import { Plus, Eye, Edit, Trash, Film as FilmIcon, Power } from "lucide-react";
 import { formatDateShort } from "@/lib/date";
 import Image from "next/image";
+import { useAuth } from "@/context/AuthContext";
 
 export default function FilmsPage() {
   const [films, setFilms] = useState<Film[]>([]);
@@ -18,8 +19,19 @@ export default function FilmsPage() {
     isOpen: false,
     film: null,
   });
+  const [toggleDialog, setToggleDialog] = useState<{ isOpen: boolean; film: Film | null }>({
+    isOpen: false,
+    film: null,
+  });
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
   const router = useRouter();
+  const { admin } = useAuth();
+
+  const roleName = admin?.role || (typeof admin?.assignedRoleId === 'string' 
+    ? admin.assignedRoleId 
+    : admin?.assignedRoleId?.name) || "";
+  const isCreator = roleName === "CREATOR";
 
   useEffect(() => {
     fetchFilms();
@@ -53,6 +65,27 @@ export default function FilmsPage() {
     }
   };
 
+  const handleToggleStatus = async () => {
+    if (!toggleDialog.film) return;
+
+    setIsToggling(true);
+    try {
+      const response = await api.patch<Film>(`/v2/films/${toggleDialog.film.filmId}/toggle-status`);
+      // Update the film in the list
+      setFilms(films.map((f) => 
+        f.filmId === toggleDialog.film?.filmId 
+          ? { ...f, isActive: response.data?.isActive ?? !f.isActive }
+          : f
+      ));
+      setToggleDialog({ isOpen: false, film: null });
+    } catch (error: any) {
+      console.error("Failed to toggle film status:", error);
+      alert(error.response?.data?.error || "Failed to toggle film status");
+    } finally {
+      setIsToggling(false);
+    }
+  };
+
   const columns = [
     {
       key: "posterUrl",
@@ -81,15 +114,29 @@ export default function FilmsPage() {
       ),
     },
     {
-      key: "creatorId",
+      key: "creator",
       label: "Creator",
       sortable: true,
       render: (film: Film) => (
-        <span className="text-gray-400">
-          {typeof film.creatorId === 'string' 
-            ? film.creatorId 
-            : film.creatorId?.name || "Unknown"}
-        </span>
+        <div className="flex items-center gap-2">
+          {film.creator?.profilePicture ? (
+            <div className="w-6 h-6 rounded-full overflow-hidden relative">
+              <Image 
+                src={film.creator.profilePicture} 
+                alt={film.creator.name} 
+                fill 
+                className="object-cover" 
+              />
+            </div>
+          ) : (
+            <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-[10px] font-bold text-gray-400">
+              {film.creator?.name?.charAt(0) || "?"}
+            </div>
+          )}
+          <span className="text-gray-300 font-medium">
+            {film.creator?.name || "Unknown Creator"}
+          </span>
+        </div>
       ),
     },
     {
@@ -97,15 +144,17 @@ export default function FilmsPage() {
       label: "Upload Date",
       sortable: true,
       render: (film: Film) => (
-        <span className="text-gray-400">{formatDateShort(new Date(film.createdAt))}</span>
+        <span className="text-gray-400">{formatDateShort(film.createdAt)}</span>
       ),
     },
     {
       key: "status",
       label: "Status",
       render: (film: Film) => (
-        <span className="px-2 py-1 bg-green-500/20 text-green-500 text-xs rounded-full">
-          Active
+        <span className={`px-2 py-1 ${
+          film.isActive !== false ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'
+        } text-xs rounded-full`}>
+          {film.isActive !== false ? 'Active' : 'Disabled'}
         </span>
       ),
     },
@@ -113,35 +162,35 @@ export default function FilmsPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="text-white text-3xl font-bold mb-2">Films</h1>
-            <p className="text-gray-400 text-sm">Manage all films on the platform</p>
+            <h1 className="text-white text-xl sm:text-2xl md:text-3xl font-bold mb-1">Films</h1>
+            <p className="text-gray-400 text-xs sm:text-sm">Manage all films on the platform</p>
           </div>
           <button
             onClick={() => router.push("/films/create")}
-            className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors"
+            className="flex items-center justify-center gap-2 px-3 py-2 sm:px-4 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors text-sm"
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
             <span className="font-medium">Add Film</span>
           </button>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-4">
-            <p className="text-gray-400 text-sm mb-1">Total Films</p>
-            <p className="text-white text-2xl font-bold">{films.length}</p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-3 md:p-4">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1">Total Films</p>
+            <p className="text-white text-xl sm:text-2xl font-bold">{films.length}</p>
           </div>
-          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-4">
-            <p className="text-gray-400 text-sm mb-1">Active</p>
-            <p className="text-white text-2xl font-bold">{films.length}</p>
+          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-3 md:p-4">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1">Active</p>
+            <p className="text-white text-xl sm:text-2xl font-bold">{films.length}</p>
           </div>
-          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-4">
-            <p className="text-gray-400 text-sm mb-1">This Month</p>
-            <p className="text-white text-2xl font-bold">
+          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-3 md:p-4">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1">This Month</p>
+            <p className="text-white text-xl sm:text-2xl font-bold">
               {films.filter((f) => {
                 const date = new Date(f.createdAt);
                 const now = new Date();
@@ -149,9 +198,9 @@ export default function FilmsPage() {
               }).length}
             </p>
           </div>
-          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-4">
-            <p className="text-gray-400 text-sm mb-1">Total Views</p>
-            <p className="text-white text-2xl font-bold">-</p>
+          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-3 md:p-4">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1">Total Views</p>
+            <p className="text-white text-xl sm:text-2xl font-bold">-</p>
           </div>
         </div>
 
@@ -175,16 +224,33 @@ export default function FilmsPage() {
               >
                 <Eye className="w-4 h-4 text-gray-400" />
               </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  router.push(`/films/${film.filmId}/edit`);
-                }}
-                className="p-2 hover:bg-secondary rounded-lg transition-colors"
-                title="Edit"
-              >
-                <Edit className="w-4 h-4 text-blue-400" />
-              </button>
+              
+              {isCreator ? (
+                // Creators can edit their films
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push(`/films/${film.filmId}/edit`);
+                  }}
+                  className="p-2 hover:bg-secondary rounded-lg transition-colors"
+                  title="Edit"
+                >
+                  <Edit className="w-4 h-4 text-blue-400" />
+                </button>
+              ) : (
+                // Admins can only disable/enable films
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setToggleDialog({ isOpen: true, film });
+                  }}
+                  className="p-2 hover:bg-secondary rounded-lg transition-colors"
+                  title={film.isActive !== false ? "Disable Film" : "Enable Film"}
+                >
+                  <Power className={`w-4 h-4 ${film.isActive !== false ? 'text-yellow-400' : 'text-green-400'}`} />
+                </button>
+              )}
+              
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -211,6 +277,20 @@ export default function FilmsPage() {
         confirmText="Delete"
         variant="danger"
         isLoading={isDeleting}
+      />
+
+      {/* Toggle Status Confirmation */}
+      <ConfirmDialog
+        isOpen={toggleDialog.isOpen}
+        onClose={() => setToggleDialog({ isOpen: false, film: null })}
+        onConfirm={handleToggleStatus}
+        title={toggleDialog.film?.isActive !== false ? "Disable Film" : "Enable Film"}
+        message={`Are you sure you want to ${
+          toggleDialog.film?.isActive !== false ? 'disable' : 'enable'
+        } "${toggleDialog.film?.title}"?`}
+        confirmText={toggleDialog.film?.isActive !== false ? "Disable" : "Enable"}
+        variant={toggleDialog.film?.isActive !== false ? "warning" : "info"}
+        isLoading={isToggling}
       />
     </DashboardLayout>
   );

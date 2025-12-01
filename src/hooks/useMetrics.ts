@@ -27,6 +27,18 @@ export function useMetrics(options: UseMetricsOptions = {}) {
     } catch (err: any) {
       console.error("Failed to fetch metrics:", err);
       setError(err.message || "Failed to fetch metrics");
+      // Set default empty metrics on error to prevent breaking the UI
+      setMetrics({
+        totalUsers: 0,
+        totalCreators: 0,
+        totalFilms: 0,
+        totalPlaylists: 0,
+        totalWatchTimeHours: 0,
+        avgWatchTimePerUser: 0,
+        userGrowth: 0,
+        filmGrowth: 0,
+        activeUsersLast30Days: 0,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -70,6 +82,8 @@ export function useUserGrowth(days: number = 30) {
     } catch (err: any) {
       console.error("Failed to fetch user growth:", err);
       setError(err.message || "Failed to fetch user growth data");
+      // Set empty array to prevent UI breakage
+      setData([]);
     } finally {
       setIsLoading(false);
     }
@@ -99,6 +113,8 @@ export function useFilmUploads(months: number = 6) {
     } catch (err: any) {
       console.error("Failed to fetch film uploads:", err);
       setError(err.message || "Failed to fetch film upload data");
+      // Set empty array to prevent UI breakage
+      setData([]);
     } finally {
       setIsLoading(false);
     }
@@ -121,13 +137,15 @@ export function usePopularFilms(limit: number = 10) {
     setError(null);
 
     try {
-      const response = await api.get<any[]>(`/v2/admin/metrics/top-films?limit=${limit}`);
+      const response = await api.get<any[]>(`/v2/admin/metrics/popular-films?limit=${limit}`);
       if (response.data) {
         setFilms(response.data as any[]);
       }
     } catch (err: any) {
       console.error("Failed to fetch popular films:", err);
       setError(err.message || "Failed to fetch popular films");
+      // Return empty array on error to prevent UI breakage
+      setFilms([]);
     } finally {
       setIsLoading(false);
     }
@@ -150,13 +168,15 @@ export function useGenreDistribution() {
     setError(null);
 
     try {
-      const response = await api.get<any[]>("/v2/admin/metrics/genre-distribution");
+      const response = await api.get<any[]>("/v2/admin/metrics/genres");
       if (response.data) {
         setData(response.data as any[]);
       }
     } catch (err: any) {
       console.error("Failed to fetch genre distribution:", err);
       setError(err.message || "Failed to fetch genre distribution");
+      // Set empty array to prevent UI breakage
+      setData([]);
     } finally {
       setIsLoading(false);
     }
@@ -179,13 +199,15 @@ export function useRecentActivities(limit: number = 10) {
     setError(null);
 
     try {
-      const response = await api.get<any[]>(`/v2/admin/metrics/recent-activity?limit=${limit}`);
+      const response = await api.get<any[]>(`/v2/admin/metrics/activities?limit=${limit}`);
       if (response.data) {
         setActivities(response.data as any[]);
       }
     } catch (err: any) {
       console.error("Failed to fetch activities:", err);
       setError(err.message || "Failed to fetch activities");
+      // Set empty array to prevent UI breakage
+      setActivities([]);
     } finally {
       setIsLoading(false);
     }

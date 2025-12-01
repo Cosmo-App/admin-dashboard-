@@ -21,57 +21,142 @@ import {
 /**
  * Format date to full format (e.g., "December 15, 2024")
  */
-export function formatDateFull(date: string | Date): string {
-  const dateObj = typeof date === "string" ? parseISO(date) : date;
-  return format(dateObj, "MMMM dd, yyyy");
+export function formatDateFull(date: string | Date | null | undefined): string {
+  if (!date) return "N/A";
+  
+  try {
+    const dateObj = typeof date === "string" ? parseISO(date) : date;
+    
+    // Check if date is valid
+    if (isNaN(dateObj.getTime())) {
+      return "Invalid Date";
+    }
+    
+    return format(dateObj, "MMMM dd, yyyy");
+  } catch (error) {
+    console.error("Date formatting error:", error);
+    return "Invalid Date";
+  }
 }
 
 /**
  * Format date to short format (e.g., "Dec 15, 2024")
  */
-export function formatDateShort(date: string | Date): string {
-  const dateObj = typeof date === "string" ? parseISO(date) : date;
-  return format(dateObj, "MMM dd, yyyy");
+export function formatDateShort(date: string | Date | null | undefined): string {
+  if (!date) return "N/A";
+  
+  try {
+    const dateObj = typeof date === "string" ? parseISO(date) : date;
+    
+    if (isNaN(dateObj.getTime())) {
+      return "Invalid Date";
+    }
+    
+    return format(dateObj, "MMM dd, yyyy");
+  } catch (error) {
+    console.error("Date formatting error:", error);
+    return "Invalid Date";
+  }
 }
 
 /**
  * Format time (e.g., "02:30 PM")
  */
-export function formatTime(date: string | Date): string {
-  const dateObj = typeof date === "string" ? parseISO(date) : date;
-  return format(dateObj, "hh:mm a");
+export function formatTime(date: string | Date | null | undefined): string {
+  if (!date) return "N/A";
+  
+  try {
+    const dateObj = typeof date === "string" ? parseISO(date) : date;
+    
+    if (isNaN(dateObj.getTime())) {
+      return "Invalid Time";
+    }
+    
+    return format(dateObj, "hh:mm a");
+  } catch (error) {
+    console.error("Time formatting error:", error);
+    return "Invalid Time";
+  }
 }
 
 /**
  * Format datetime (e.g., "Dec 15, 2024 02:30 PM")
  */
-export function formatDateTime(date: string | Date): string {
-  const dateObj = typeof date === "string" ? parseISO(date) : date;
-  return format(dateObj, "MMM dd, yyyy hh:mm a");
+export function formatDateTime(date: string | Date | null | undefined): string {
+  if (!date) return "N/A";
+  
+  try {
+    const dateObj = typeof date === "string" ? parseISO(date) : date;
+    
+    if (isNaN(dateObj.getTime())) {
+      return "Invalid DateTime";
+    }
+    
+    return format(dateObj, "MMM dd, yyyy hh:mm a");
+  } catch (error) {
+    console.error("DateTime formatting error:", error);
+    return "Invalid DateTime";
+  }
 }
 
 /**
  * Format date to ISO (e.g., "2024-12-15")
  */
-export function formatDateISO(date: string | Date): string {
-  const dateObj = typeof date === "string" ? parseISO(date) : date;
-  return format(dateObj, "yyyy-MM-dd");
+export function formatDateISO(date: string | Date | null | undefined): string {
+  if (!date) return "";
+  
+  try {
+    const dateObj = typeof date === "string" ? parseISO(date) : date;
+    
+    if (isNaN(dateObj.getTime())) {
+      return "";
+    }
+    
+    return format(dateObj, "yyyy-MM-dd");
+  } catch (error) {
+    console.error("ISO date formatting error:", error);
+    return "";
+  }
 }
 
 /**
  * Format relative time (e.g., "2 hours ago", "in 3 days")
  */
-export function formatRelativeTime(date: string | Date): string {
-  const dateObj = typeof date === "string" ? parseISO(date) : date;
-  return formatDistance(dateObj, new Date(), { addSuffix: true });
+export function formatRelativeTime(date: string | Date | null | undefined): string {
+  if (!date) return "N/A";
+  
+  try {
+    const dateObj = typeof date === "string" ? parseISO(date) : date;
+    
+    if (isNaN(dateObj.getTime())) {
+      return "Invalid Date";
+    }
+    
+    return formatDistance(dateObj, new Date(), { addSuffix: true });
+  } catch (error) {
+    console.error("Relative time formatting error:", error);
+    return "N/A";
+  }
 }
 
 /**
  * Format relative date with context (e.g., "Today at 2:30 PM", "Yesterday at 5:00 PM")
  */
-export function formatRelativeDate(date: string | Date): string {
-  const dateObj = typeof date === "string" ? parseISO(date) : date;
-  return formatRelative(dateObj, new Date());
+export function formatRelativeDate(date: string | Date | null | undefined): string {
+  if (!date) return "N/A";
+  
+  try {
+    const dateObj = typeof date === "string" ? parseISO(date) : date;
+    
+    if (isNaN(dateObj.getTime())) {
+      return "Invalid Date";
+    }
+    
+    return formatRelative(dateObj, new Date());
+  } catch (error) {
+    console.error("Relative date formatting error:", error);
+    return "N/A";
+  }
 }
 
 /**
@@ -83,30 +168,41 @@ export function formatRelativeDate(date: string | Date): string {
  * - This year: "Dec 15, 2024"
  * - Older: "Dec 15, 2023"
  */
-export function formatSmartDate(date: string | Date): string {
-  const dateObj = typeof date === "string" ? parseISO(date) : date;
+export function formatSmartDate(date: string | Date | null | undefined): string {
+  if (!date) return "N/A";
+  
+  try {
+    const dateObj = typeof date === "string" ? parseISO(date) : date;
+    
+    if (isNaN(dateObj.getTime())) {
+      return "Invalid Date";
+    }
 
-  if (isToday(dateObj)) {
-    return `Today at ${format(dateObj, "hh:mm a")}`;
-  }
+    if (isToday(dateObj)) {
+      return `Today at ${format(dateObj, "hh:mm a")}`;
+    }
 
-  if (isYesterday(dateObj)) {
-    return `Yesterday at ${format(dateObj, "hh:mm a")}`;
-  }
+    if (isYesterday(dateObj)) {
+      return `Yesterday at ${format(dateObj, "hh:mm a")}`;
+    }
 
-  if (isThisWeek(dateObj)) {
-    return format(dateObj, "EEEE 'at' hh:mm a");
-  }
+    if (isThisWeek(dateObj)) {
+      return format(dateObj, "EEEE 'at' hh:mm a");
+    }
 
-  if (isThisMonth(dateObj)) {
-    return format(dateObj, "MMM dd 'at' hh:mm a");
-  }
+    if (isThisMonth(dateObj)) {
+      return format(dateObj, "MMM dd 'at' hh:mm a");
+    }
 
-  if (isThisYear(dateObj)) {
+    if (isThisYear(dateObj)) {
+      return format(dateObj, "MMM dd, yyyy");
+    }
+
     return format(dateObj, "MMM dd, yyyy");
+  } catch (error) {
+    console.error("Smart date formatting error:", error);
+    return "N/A";
   }
-
-  return format(dateObj, "MMM dd, yyyy");
 }
 
 /**
@@ -117,21 +213,33 @@ export function formatSmartDate(date: string | Date): string {
  * - < 7 days: "Xd ago"
  * - Older: Full date
  */
-export function getTimeAgoShort(date: string | Date): string {
-  const dateObj = typeof date === "string" ? parseISO(date) : date;
-  const now = new Date();
+export function getTimeAgoShort(date: string | Date | null | undefined): string {
+  if (!date) return "N/A";
+  
+  try {
+    const dateObj = typeof date === "string" ? parseISO(date) : date;
+    
+    if (isNaN(dateObj.getTime())) {
+      return "Invalid Date";
+    }
+    
+    const now = new Date();
 
-  const minutes = differenceInMinutes(now, dateObj);
-  if (minutes < 1) return "Just now";
-  if (minutes < 60) return `${minutes}m ago`;
+    const minutes = differenceInMinutes(now, dateObj);
+    if (minutes < 1) return "Just now";
+    if (minutes < 60) return `${minutes}m ago`;
 
-  const hours = differenceInHours(now, dateObj);
-  if (hours < 24) return `${hours}h ago`;
+    const hours = differenceInHours(now, dateObj);
+    if (hours < 24) return `${hours}h ago`;
 
-  const days = differenceInDays(now, dateObj);
-  if (days < 7) return `${days}d ago`;
+    const days = differenceInDays(now, dateObj);
+    if (days < 7) return `${days}d ago`;
 
-  return formatDateShort(dateObj);
+    return formatDateShort(dateObj);
+  } catch (error) {
+    console.error("Time ago formatting error:", error);
+    return "N/A";
+  }
 }
 
 /**

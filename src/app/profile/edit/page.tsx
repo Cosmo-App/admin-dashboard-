@@ -11,6 +11,7 @@ import { api } from "@/lib/api";
 import { Admin } from "@/types/models";
 import { ArrowLeft, Save } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
 
 const profileSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -26,6 +27,7 @@ export default function EditProfilePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [profilePicture, setProfilePicture] = useState<string>("");
   const router = useRouter();
+  const { refreshSession } = useAuth();
 
   const {
     register,
@@ -44,8 +46,8 @@ export default function EditProfilePage() {
   const fetchProfile = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get<Admin>("/v2/auth/admin/me");
-      const adminData = response.data as Admin;
+      const response = await api.get<{ admin: Admin }>("/v2/auth/admin/session");
+      const adminData = response.data.admin as Admin;
       setAdmin(adminData);
       setProfilePicture(adminData.profilePicture || "");
 
@@ -65,14 +67,18 @@ export default function EditProfilePage() {
   const onSubmit = async (data: ProfileFormData) => {
     setIsSubmitting(true);
     try {
-      await api.put(`/v2/admin/${admin?.adminId}`, {
+      await api.put("/v2/auth/admin/profile", {
         name: data.name,
         profilePicture: profilePicture || undefined,
       });
+      
+      // Refresh the session to get updated admin data
+      await refreshSession();
+      
       router.push("/profile");
     } catch (error: any) {
       console.error("Failed to update profile:", error);
-      alert(error.response?.data?.error || "Failed to update profile");
+      alert(error?.message || "Failed to update profile");
     } finally {
       setIsSubmitting(false);
     }

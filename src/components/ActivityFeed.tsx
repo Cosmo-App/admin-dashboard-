@@ -74,8 +74,11 @@ export default function ActivityFeed({ activities, isLoading, limit = 10 }: Acti
   }
 
   return (
-    <div className="space-y-2">
-      {displayActivities.map((activity) => {
+    <div className="relative space-y-0">
+      {/* Timeline Line */}
+      <div className="absolute left-[19px] top-4 bottom-4 w-[2px] bg-secondary/30 rounded-full" />
+
+      {displayActivities.map((activity, index) => {
         const ActionIcon = actionIcons[activity.action] || Upload;
         const ResourceIcon = resourceIcons[activity.resource] || Film;
         const actionColor = actionColors[activity.action] || "text-gray-400";
@@ -83,36 +86,41 @@ export default function ActivityFeed({ activities, isLoading, limit = 10 }: Acti
         return (
           <div
             key={activity.activityId}
-            className="flex items-start gap-3 p-3 bg-[#1a1a1a] border border-secondary rounded-lg hover:border-primary/50 transition-colors duration-200"
+            className="relative flex items-start gap-4 p-3 hover:bg-white/5 rounded-xl transition-colors duration-200 group"
           >
             {/* Icon */}
-            <div className="w-10 h-10 bg-secondary rounded-full flex items-center justify-center flex-shrink-0">
-              <ActionIcon className={cn("w-5 h-5", actionColor)} />
+            <div className="relative z-10 w-10 h-10 bg-[#1a1a1a] border border-secondary group-hover:border-primary/50 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm transition-colors">
+              <ActionIcon className={cn("w-4 h-4", actionColor)} />
             </div>
 
             {/* Content */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 pt-1">
               <div className="flex items-start justify-between gap-2 mb-1">
-                <p className="text-white text-sm">
-                  <span className="font-medium">
+                <div className="text-sm text-gray-300">
+                  <span className="font-semibold text-white hover:text-primary cursor-pointer transition-colors">
                     {activity.adminEmail || activity.userId || "Unknown"}
                   </span>{" "}
-                  <span className="text-gray-400">{activity.action}</span>{" "}
-                  <span className="font-medium">{activity.resource}</span>
+                  <span className="text-gray-500">{activity.action}</span>{" "}
+                  <span className="font-medium text-gray-300">{activity.resource}</span>
                   {activity.resourceName && (
                     <>
                       {" "}
-                      <span className="text-gray-400">-</span>{" "}
-                      <span className="text-primary">{activity.resourceName}</span>
+                      <span className="text-gray-600 mx-1">•</span>{" "}
+                      <span className="text-primary font-medium">{activity.resourceName}</span>
                     </>
                   )}
-                </p>
-                <ResourceIcon className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                </div>
+                <span className="text-[10px] text-gray-600 whitespace-nowrap font-mono bg-secondary/20 px-1.5 py-0.5 rounded">
+                  {formatSmartDate(activity.createdAt || activity.timestamp)}
+                </span>
               </div>
-
-              <p className="text-gray-500 text-xs">
-                {formatSmartDate(new Date(activity.createdAt || activity.timestamp))}
-              </p>
+              
+              <div className="flex items-center gap-2 mt-1">
+                <ResourceIcon className="w-3 h-3 text-gray-600" />
+                <p className="text-xs text-gray-500 truncate">
+                  ID: {activity.resourceId || "N/A"}
+                </p>
+              </div>
             </div>
           </div>
         );

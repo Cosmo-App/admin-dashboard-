@@ -117,7 +117,7 @@ export default function ViewAdminPage() {
             <div>
               <h1 className="text-white text-3xl font-bold">{admin.name}</h1>
               <p className="text-gray-400 text-sm mt-1">
-                Joined {formatDateFull(new Date(admin.createdAt))}
+                Joined {formatDateFull(admin.createdAt)}
               </p>
             </div>
           </div>
@@ -296,19 +296,19 @@ export default function ViewAdminPage() {
                 <div className="flex items-start justify-between py-3 border-b border-secondary">
                   <span className="text-gray-400 text-sm">Last Login</span>
                   <span className="text-white text-sm font-medium">
-                    {admin.lastLogin ? formatDateFull(new Date(admin.lastLogin)) : "Never"}
+                    {admin.lastLogin ? formatDateFull(admin.lastLogin) : "Never"}
                   </span>
                 </div>
                 <div className="flex items-start justify-between py-3 border-b border-secondary">
                   <span className="text-gray-400 text-sm">Account Created</span>
                   <span className="text-white text-sm font-medium">
-                    {formatDateFull(new Date(admin.createdAt))}
+                    {formatDateFull(admin.createdAt)}
                   </span>
                 </div>
                 <div className="flex items-start justify-between py-3">
                   <span className="text-gray-400 text-sm">Last Updated</span>
                   <span className="text-white text-sm font-medium">
-                    {admin.updatedAt ? formatDateFull(new Date(admin.updatedAt)) : "Never"}
+                    {admin.updatedAt ? formatDateFull(admin.updatedAt) : "Never"}
                   </span>
                 </div>
               </div>

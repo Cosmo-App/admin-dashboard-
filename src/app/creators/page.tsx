@@ -79,19 +79,26 @@ export default function CreatorsPage() {
       key: "filmsCount",
       label: "Films",
       sortable: true,
-      render: () => <span className="text-white">-</span>,
+      render: (creator: Creator) => (
+        <div className="flex items-center gap-2">
+          <Film className="w-4 h-4 text-gray-400" />
+          <span className="text-white font-medium">{creator.filmsCount || 0}</span>
+        </div>
+      ),
     },
     {
       key: "totalViews",
       label: "Total Views",
       sortable: true,
-      render: () => <span className="text-white">-</span>,
+      render: (creator: Creator) => (
+        <span className="text-white">{(creator.totalViews || 0).toLocaleString()}</span>
+      ),
     },
     {
       key: "createdAt",
       label: "Joined Date",
       sortable: true,
-      render: (creator: Creator) => formatDateShort(new Date(creator.createdAt)),
+      render: (creator: Creator) => formatDateShort(creator.createdAt),
     },
     {
       key: "isActive",
@@ -138,47 +145,47 @@ export default function CreatorsPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-white text-3xl font-bold mb-2">Creators</h1>
-          <p className="text-gray-400 text-sm">Manage content creators</p>
+          <h1 className="text-white text-xl sm:text-2xl md:text-3xl font-bold mb-1">Creators</h1>
+          <p className="text-gray-400 text-xs sm:text-sm">Manage content creators</p>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-3 md:p-4 lg:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm mb-1">Total Creators</p>
-                <p className="text-white text-2xl font-bold">{creators.length}</p>
+                <p className="text-gray-400 text-xs sm:text-sm mb-1">Total Creators</p>
+                <p className="text-white text-xl sm:text-2xl font-bold">{creators.length}</p>
               </div>
-              <div className="p-3 bg-primary/20 rounded-lg">
-                <Users className="w-6 h-6 text-primary" />
+              <div className="p-2 md:p-3 bg-primary/20 rounded-lg flex-shrink-0">
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-primary" />
               </div>
             </div>
           </div>
 
-          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-6">
+          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-3 md:p-4 lg:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm mb-1">Active Creators</p>
-                <p className="text-white text-2xl font-bold">{activeCreators.length}</p>
+                <p className="text-gray-400 text-xs sm:text-sm mb-1">Active Creators</p>
+                <p className="text-white text-xl sm:text-2xl font-bold">{activeCreators.length}</p>
               </div>
-              <div className="p-3 bg-green-500/20 rounded-lg">
-                <CheckCircle className="w-6 h-6 text-green-400" />
+              <div className="p-2 md:p-3 bg-green-500/20 rounded-lg flex-shrink-0">
+                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-green-400" />
               </div>
             </div>
           </div>
 
-          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-6">
+          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-3 md:p-4 lg:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm mb-1">New This Month</p>
-                <p className="text-white text-2xl font-bold">{thisMonthCreators.length}</p>
+                <p className="text-gray-400 text-xs sm:text-sm mb-1">New This Month</p>
+                <p className="text-white text-xl sm:text-2xl font-bold">{thisMonthCreators.length}</p>
               </div>
-              <div className="p-3 bg-blue-500/20 rounded-lg">
-                <Clock className="w-6 h-6 text-blue-400" />
+              <div className="p-2 md:p-3 bg-blue-500/20 rounded-lg flex-shrink-0">
+                <Clock className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-400" />
               </div>
             </div>
           </div>

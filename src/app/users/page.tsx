@@ -77,7 +77,7 @@ export default function UsersPage() {
       key: "createdAt",
       label: "Joined Date",
       sortable: true,
-      render: (user: User) => formatDateShort(new Date(user.createdAt)),
+      render: (user: User) => formatDateShort(user.createdAt),
     },
     {
       key: "isActive",
@@ -111,52 +111,52 @@ export default function UsersPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-white text-3xl font-bold mb-2">Users</h1>
-          <p className="text-gray-400 text-sm">Manage platform users</p>
+          <h1 className="text-white text-xl sm:text-2xl md:text-3xl font-bold mb-1">Users</h1>
+          <p className="text-gray-400 text-xs sm:text-sm">Manage platform users</p>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-3 md:p-4 lg:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm mb-1">Total Users</p>
-                <p className="text-white text-2xl font-bold">{users.length}</p>
+                <p className="text-gray-400 text-xs sm:text-sm mb-1">Total Users</p>
+                <p className="text-white text-xl sm:text-2xl font-bold">{users.length}</p>
               </div>
-              <div className="p-3 bg-primary/20 rounded-lg">
-                <Users className="w-6 h-6 text-primary" />
+              <div className="p-2 md:p-3 bg-primary/20 rounded-lg flex-shrink-0">
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-primary" />
               </div>
             </div>
           </div>
 
-          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-6">
+          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-3 md:p-4 lg:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm mb-1">Active Users</p>
-                <p className="text-white text-2xl font-bold">{activeUsers.length}</p>
+                <p className="text-gray-400 text-xs sm:text-sm mb-1">Active Users</p>
+                <p className="text-white text-xl sm:text-2xl font-bold">{activeUsers.length}</p>
               </div>
-              <div className="p-3 bg-green-500/20 rounded-lg">
-                <CheckCircle className="w-6 h-6 text-green-400" />
+              <div className="p-2 md:p-3 bg-green-500/20 rounded-lg flex-shrink-0">
+                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-green-400" />
               </div>
             </div>
           </div>
 
-          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-6">
+          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-3 md:p-4 lg:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm mb-1">New This Month</p>
-                <p className="text-white text-2xl font-bold">{thisMonthUsers.length}</p>
+                <p className="text-gray-400 text-xs sm:text-sm mb-1">New This Month</p>
+                <p className="text-white text-xl sm:text-2xl font-bold">{thisMonthUsers.length}</p>
               </div>
-              <div className="p-3 bg-blue-500/20 rounded-lg">
-                <Clock className="w-6 h-6 text-blue-400" />
+              <div className="p-2 md:p-3 bg-blue-500/20 rounded-lg flex-shrink-0">
+                <Clock className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-400" />
               </div>
             </div>
           </div>
 
-          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-6">
+          <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-3 md:p-4 lg:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm mb-1">Inactive</p>

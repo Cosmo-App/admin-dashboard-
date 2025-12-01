@@ -97,7 +97,7 @@ export default function ViewUserPage() {
             <div>
               <h1 className="text-white text-3xl font-bold">{user.username}</h1>
               <p className="text-gray-400 text-sm mt-1">
-                Joined {formatDateFull(new Date(user.createdAt))}
+                Joined {formatDateFull(user.createdAt)}
               </p>
             </div>
           </div>
@@ -215,7 +215,7 @@ export default function ViewUserPage() {
                 <div className="flex items-start justify-between py-2 border-b border-secondary">
                   <span className="text-gray-400 text-sm">Joined Date</span>
                   <span className="text-white text-sm font-medium">
-                    {formatDateFull(new Date(user.createdAt))}
+                    {formatDateFull(user.createdAt)}
                   </span>
                 </div>
                 <div className="flex items-start justify-between py-2">
