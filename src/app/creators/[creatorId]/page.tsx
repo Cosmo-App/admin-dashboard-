@@ -27,8 +27,8 @@ export default function ViewCreatorPage() {
 
   const fetchCreator = async () => {
     try {
-      const response = await api.get(`/v2/creators/${creatorId}`);
-      setCreator(response.data);
+      const response = await api.get<Creator>(`/v2/creators/${creatorId}`);
+      setCreator(response.data as Creator);
     } catch (error) {
       console.error("Failed to fetch creator:", error);
       router.push("/creators");
@@ -38,8 +38,8 @@ export default function ViewCreatorPage() {
   const fetchCreatorFilms = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get(`/v2/films?creatorId=${creatorId}`);
-      setFilms(response.data);
+      const response = await api.get<Film[]>(`/v2/films?creatorId=${creatorId}`);
+      setFilms(response.data as Film[]);
     } catch (error) {
       console.error("Failed to fetch films:", error);
     } finally {
@@ -251,6 +251,7 @@ export default function ViewCreatorPage() {
               <DataTable
                 data={films}
                 columns={filmColumns}
+                keyField="filmId"
                 searchPlaceholder="Search films..."
                 emptyMessage="No films found."
                 isLoading={isLoading}

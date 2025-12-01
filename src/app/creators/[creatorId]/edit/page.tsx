@@ -49,8 +49,8 @@ export default function EditCreatorPage() {
   const fetchCreator = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get(`/v2/creators/${creatorId}`);
-      const creatorData = response.data;
+      const response = await api.get<Creator>(`/v2/creators/${creatorId}`);
+      const creatorData = response.data as Creator;
       setCreator(creatorData);
       setProfilePicture(creatorData.profilePicture || "");
 

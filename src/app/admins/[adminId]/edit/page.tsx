@@ -58,15 +58,19 @@ export default function EditAdminPage() {
   const fetchAdmin = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get(`/v2/admin/${adminId}`);
-      const adminData = response.data;
+      const response = await api.get<Admin>(`/v2/admin/${adminId}`);
+      const adminData = response.data as Admin;
       setAdmin(adminData);
       setProfilePicture(adminData.profilePicture || "");
+
+      const roleName = adminData.role || (typeof adminData.assignedRoleId === 'string' 
+        ? adminData.assignedRoleId 
+        : adminData.assignedRoleId?.name) || "ADMIN";
 
       reset({
         name: adminData.name,
         email: adminData.email,
-        role: adminData.role,
+        role: (roleName === "SUPERADMIN" || roleName === "ADMIN" ? roleName : "ADMIN") as "ADMIN" | "SUPERADMIN",
         profilePicture: adminData.profilePicture || "",
       });
     } catch (error) {

@@ -21,8 +21,8 @@ export default function ProfilePage() {
   const fetchProfile = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get("/v2/auth/admin/me");
-      setAdmin(response.data);
+      const response = await api.get<Admin>("/v2/auth/admin/session");
+      setAdmin(response.data as Admin);
     } catch (error) {
       console.error("Failed to fetch profile:", error);
     } finally {
@@ -92,7 +92,11 @@ export default function ProfilePage() {
                 </div>
                 <div>
                   <p className="text-gray-400 text-xs">Role</p>
-                  <p className="text-white text-lg font-semibold uppercase">{admin.role}</p>
+                  <p className="text-white text-lg font-semibold uppercase">
+                    {admin.role || (typeof admin.assignedRoleId === 'string' 
+                      ? admin.assignedRoleId 
+                      : admin.assignedRoleId?.name || "Admin")}
+                  </p>
                 </div>
               </div>
             </div>
@@ -117,7 +121,11 @@ export default function ProfilePage() {
                 </div>
                 <div className="flex items-start justify-between py-3 border-b border-secondary">
                   <span className="text-gray-400 text-sm">Role</span>
-                  <span className="text-white text-sm font-medium uppercase">{admin.role}</span>
+                  <span className="text-white text-sm font-medium uppercase">
+                    {admin.role || (typeof admin.assignedRoleId === 'string' 
+                      ? admin.assignedRoleId 
+                      : admin.assignedRoleId?.name || "Admin")}
+                  </span>
                 </div>
                 <div className="flex items-start justify-between py-3">
                   <span className="text-gray-400 text-sm">Admin ID</span>

@@ -45,47 +45,47 @@ export default function MetricCard({
 
   if (isLoading) {
     return (
-      <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-6 animate-pulse">
+      <div className="bg-secondary border border-border rounded-2xl p-6 sm:p-8 animate-pulse">
         <div className="flex items-center justify-between mb-4">
-          <div className="h-4 bg-secondary rounded w-24"></div>
-          <div className="w-10 h-10 bg-secondary rounded-lg"></div>
+          <div className="h-4 bg-border rounded w-24"></div>
+          <div className="w-12 h-12 bg-border rounded-xl"></div>
         </div>
-        <div className="h-8 bg-secondary rounded w-32 mb-2"></div>
-        <div className="h-3 bg-secondary rounded w-20"></div>
+        <div className="h-9 bg-border rounded w-32 mb-2"></div>
+        <div className="h-3 bg-border rounded w-20"></div>
       </div>
     );
   }
 
   return (
-    <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-6 hover:border-primary/50 transition-colors duration-200">
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-gray-400 text-sm font-medium">{title}</p>
-        <div className="w-10 h-10 bg-secondary rounded-lg flex items-center justify-center">
-          <Icon className="w-5 h-5 text-primary" />
+    <div className="group bg-secondary border border-border rounded-2xl p-6 sm:p-8 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 card-hover">
+      <div className="flex items-center justify-between mb-6">
+        <p className="text-gray-400 text-sm sm:text-base font-semibold tracking-wide uppercase">{title}</p>
+        <div className="w-12 h-12 sm:w-14 sm:h-14 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+          <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-primary" />
         </div>
       </div>
 
-      <p className="text-white text-3xl font-bold mb-2">
+      <p className="text-white text-3xl sm:text-4xl font-bold mb-3 tracking-tight">
         {formatValue(value)}
         {suffix && !format.includes("time") && (
-          <span className="text-lg ml-1 text-gray-400">{suffix}</span>
+          <span className="text-xl sm:text-2xl ml-1 text-gray-400 font-semibold">{suffix}</span>
         )}
       </p>
 
       {change !== undefined && (
-        <div className="flex items-center gap-1">
-          {isPositive && <TrendingUp className="w-4 h-4 text-green-500" />}
-          {isNegative && <TrendingDown className="w-4 h-4 text-red-500" />}
+        <div className="flex items-center gap-2">
+          {isPositive && <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-success" />}
+          {isNegative && <TrendingDown className="w-4 h-4 sm:w-5 sm:h-5 text-error" />}
           <span
             className={cn(
-              "text-sm font-medium",
-              isPositive && "text-green-500",
-              isNegative && "text-red-500",
+              "text-xs sm:text-sm font-semibold",
+              isPositive && "text-success",
+              isNegative && "text-error",
               !isPositive && !isNegative && "text-gray-400"
             )}
           >
             {change > 0 && "+"}
-            {change}% from last period
+            {change}% <span className="text-gray-500 font-normal">from last period</span>
           </span>
         </div>
       )}

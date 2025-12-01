@@ -35,8 +35,8 @@ export default function AdminsPage() {
   const fetchAdmins = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get("/v2/admin");
-      setAdmins(response.data);
+      const response = await api.get<Admin[]>("/v2/admin");
+      setAdmins(response.data as Admin[]);
     } catch (error) {
       console.error("Failed to fetch admins:", error);
     } finally {
@@ -256,6 +256,7 @@ export default function AdminsPage() {
         <DataTable
           data={admins}
           columns={columns}
+          keyField="adminId"
           searchPlaceholder="Search admins by name, email..."
           emptyMessage="No admins found. Click 'Add Admin' to create one."
           isLoading={isLoading}

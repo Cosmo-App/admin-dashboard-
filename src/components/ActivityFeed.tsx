@@ -111,7 +111,7 @@ export default function ActivityFeed({ activities, isLoading, limit = 10 }: Acti
               </div>
 
               <p className="text-gray-500 text-xs">
-                {formatSmartDate(new Date(activity.createdAt))}
+                {formatSmartDate(new Date(activity.createdAt || activity.timestamp))}
               </p>
             </div>
           </div>

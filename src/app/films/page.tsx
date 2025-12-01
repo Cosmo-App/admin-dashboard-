@@ -28,8 +28,8 @@ export default function FilmsPage() {
   const fetchFilms = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get("/v2/films");
-      setFilms(response.data || []);
+      const response = await api.get<Film[]>("/v2/films");
+      setFilms(response.data as Film[] || []);
     } catch (error) {
       console.error("Failed to fetch films:", error);
     } finally {
@@ -85,7 +85,11 @@ export default function FilmsPage() {
       label: "Creator",
       sortable: true,
       render: (film: Film) => (
-        <span className="text-gray-400">{film.creatorId?.name || "Unknown"}</span>
+        <span className="text-gray-400">
+          {typeof film.creatorId === 'string' 
+            ? film.creatorId 
+            : film.creatorId?.name || "Unknown"}
+        </span>
       ),
     },
     {

@@ -22,8 +22,8 @@ export default function CreatorsPage() {
   const fetchCreators = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get("/v2/creators");
-      setCreators(response.data);
+      const response = await api.get<Creator[]>("/v2/creators");
+      setCreators(response.data as Creator[]);
     } catch (error) {
       console.error("Failed to fetch creators:", error);
     } finally {
@@ -188,6 +188,7 @@ export default function CreatorsPage() {
         <DataTable
           data={creators}
           columns={columns}
+          keyField="creatorId"
           searchPlaceholder="Search creators by name..."
           emptyMessage="No creators found."
           isLoading={isLoading}

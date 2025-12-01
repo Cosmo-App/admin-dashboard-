@@ -40,8 +40,8 @@ export default function ViewUserPage() {
   const fetchUser = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get(`/v2/users/${userId}`);
-      setUser(response.data);
+      const response = await api.get<User>(`/v2/users/${userId}`);
+      setUser(response.data as User);
     } catch (error) {
       console.error("Failed to fetch user:", error);
       router.push("/users");
@@ -243,6 +243,7 @@ export default function ViewUserPage() {
                 <DataTable
                   data={likedFilms}
                   columns={[]}
+                  keyField="_id"
                   searchPlaceholder="Search liked films..."
                   emptyMessage="No liked films."
                 />
@@ -261,6 +262,7 @@ export default function ViewUserPage() {
                 <DataTable
                   data={watchlist}
                   columns={[]}
+                  keyField="_id"
                   searchPlaceholder="Search watchlist..."
                   emptyMessage="No films in watchlist."
                 />

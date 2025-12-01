@@ -51,8 +51,8 @@ export default function ViewAdminPage() {
   const fetchAdmin = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get(`/v2/admin/${adminId}`);
-      setAdmin(response.data);
+      const response = await api.get<Admin>(`/v2/admin/${adminId}`);
+      setAdmin(response.data as Admin);
     } catch (error) {
       console.error("Failed to fetch admin:", error);
       router.push("/admins");

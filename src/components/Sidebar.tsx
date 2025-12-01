@@ -78,13 +78,18 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
 
     // Check role requirements
     if (item.requiredRoles?.length) {
-      const hasRole = item.requiredRoles.includes(admin.assignedRoleId?.name || "");
+      const roleName = typeof admin.assignedRoleId === 'string' 
+        ? admin.assignedRoleId 
+        : admin.assignedRoleId?.name || "";
+      const hasRole = item.requiredRoles.includes(roleName);
       if (!hasRole) return false;
     }
 
     // Check permission requirements
     if (item.requiredPermissions?.length) {
-      const adminPermissions = admin.assignedRoleId?.permissions || [];
+      const adminPermissions = typeof admin.assignedRoleId === 'string' 
+        ? [] 
+        : admin.assignedRoleId?.permissions || [];
       const hasAllPermission = adminPermissions.includes("all");
       const hasRequiredPermission = item.requiredPermissions.some((perm) =>
         adminPermissions.includes(perm)
@@ -107,7 +112,7 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       )}
     >
       {/* Logo & Toggle */}
-      <div className="flex h-20 items-center justify-between px-5 border-b border-border flex-shrink-0">
+      <div className="flex h-20 items-center justify-between px-5 border-b border-border shrink-0">
         <Link 
           href="/" 
           className={cn(
@@ -115,7 +120,7 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
             isCollapsed && "opacity-0 w-0"
           )}
         >
-          <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 flex-shrink-0">
+          <div className="w-10 h-10 bg-linear-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 shrink-0">
             <span className="text-white font-bold text-xl">C</span>
           </div>
           {!isCollapsed && (
@@ -151,14 +156,14 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
               className={cn(
                 "flex items-center gap-3.5 px-4 py-3.5 rounded-xl transition-all duration-200 group relative",
                 isActive
-                  ? "bg-gradient-to-r from-primary to-primary/90 text-white shadow-lg shadow-primary/20"
+                  ? "bg-linear-to-r from-primary to-primary/90 text-white shadow-lg shadow-primary/20"
                   : "text-gray-400 hover:bg-secondary hover:text-white",
                 isCollapsed && "justify-center px-0"
               )}
               title={isCollapsed ? item.label : undefined}
             >
               <Icon className={cn(
-                "flex-shrink-0 transition-transform duration-200",
+                "shrink-0 transition-transform duration-200",
                 isActive ? "w-5 h-5" : "w-5 h-5 group-hover:scale-110"
               )} />
               {!isCollapsed && (
@@ -175,21 +180,23 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       {/* Admin Info */}
       {admin && (
         <div className={cn(
-          "border-t border-border p-4 flex-shrink-0",
+          "border-t border-border p-4 shrink-0",
           isCollapsed && "px-2"
         )}>
           <div className={cn(
             "flex items-center gap-3 p-3 rounded-xl bg-secondary/50 hover:bg-secondary transition-all duration-200",
             isCollapsed && "justify-center p-2"
           )}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-lg flex-shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-primary/20 to-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-lg shrink-0">
               {admin.name?.charAt(0).toUpperCase()}
             </div>
             {!isCollapsed && (
               <div className="flex-1 min-w-0">
                 <p className="text-white text-sm font-semibold truncate">{admin.name}</p>
                 <p className="text-gray-400 text-xs truncate mt-0.5">
-                  {admin.assignedRoleId?.name || "Admin"}
+                  {typeof admin.assignedRoleId === 'string' 
+                    ? admin.assignedRoleId 
+                    : admin.assignedRoleId?.name || "Admin"}
                 </p>
               </div>
             )}

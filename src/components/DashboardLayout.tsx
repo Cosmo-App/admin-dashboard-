@@ -19,8 +19,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     return (
       <div className="flex h-screen items-center justify-center bg-black">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-gray-400 text-sm">Loading...</p>
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <div className="text-center">
+            <p className="text-white text-lg font-semibold">Loading Dashboard</p>
+            <p className="text-gray-400 text-sm mt-1">Please wait...</p>
+          </div>
         </div>
       </div>
     );
@@ -39,18 +42,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Main Content */}
       <div
         className={cn(
-          "lg:transition-all lg:duration-300",
-          isCollapsed ? "lg:ml-16" : "lg:ml-64",
-          "pt-16 lg:pt-0"
+          "transition-all duration-300 ease-in-out",
+          isCollapsed ? "lg:ml-20" : "lg:ml-72"
         )}
       >
-        {/* Header (Desktop only) */}
-        <div className="hidden lg:block">
-          <Header />
-        </div>
+        {/* Header */}
+        <Header />
 
         {/* Page Content */}
-        <main className="min-h-[calc(100vh-4rem)] p-6">{children}</main>
+        <main className="min-h-[calc(100vh-5rem)] p-4 sm:p-6 lg:p-8 max-w-[1920px] mx-auto">
+          {children}
+        </main>
       </div>
     </div>
   );

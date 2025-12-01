@@ -54,8 +54,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const response = await api.get("/v2/auth/admin/session");
-      if (response.data?.admin) {
+      const response = await api.get<{ admin: Admin }>("/v2/auth/admin/session");
+      if (response?.data?.admin) {
         setAdmin(response.data.admin);
       } else {
         setAdmin(null);
@@ -73,8 +73,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Refresh token
   const refreshToken = useCallback(async () => {
     try {
-      const response = await api.post("/v2/auth/admin/refresh");
-      if (response.data?.admin) {
+      const response = await api.post<{ admin: Admin; token: string }>("/v2/auth/admin/refresh");
+      if (response?.data?.admin) {
         setAdmin(response.data.admin);
       }
     } catch (error) {
@@ -88,9 +88,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Login
   const login = useCallback(async (email: string, password: string) => {
     try {
-      const response = await api.post("/v2/auth/admin/login", { email, password });
+      console.log('[AuthContext] Attempting login for:', email);
+      const response = await api.post<{ admin: Admin; token: string }>("/v2/auth/admin/login", { email, password });
       
-      if (response.data?.admin && response.data?.token) {
+      console.log('[AuthContext] Login response:', response);
+      console.log('[AuthContext] Response structure:', {
+        hasResponse: !!response,
+        hasData: !!response?.data,
+        hasAdmin: !!response?.data?.admin,
+        hasToken: !!response?.data?.token,
+        dataKeys: response?.data ? Object.keys(response.data) : [],
+      });
+
+      if (response?.data?.admin && response?.data?.token) {
+        console.log('[AuthContext] Setting admin:', response.data.admin.email);
         setAdmin(response.data.admin);
         // Cookie is set by backend, but we can also set it client-side for immediate access
         Cookies.set(SESSION_COOKIE_NAME, response.data.token, {
@@ -98,12 +109,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           sameSite: "strict",
           secure: process.env.NODE_ENV === "production",
         });
+        console.log('[AuthContext] Login successful, redirecting to dashboard');
         router.push("/");
       } else {
+        console.error('[AuthContext] Invalid response structure:', response);
         throw new Error("Invalid response from server");
       }
     } catch (error: any) {
-      console.error("Login failed:", error);
+      console.error("[AuthContext] Login failed:", error);
+      console.error("[AuthContext] Error details:", {
+        message: error?.message,
+        response: error?.response,
+        data: error?.response?.data,
+        hasDetails: !!error?.details,
+      });
       throw error;
     }
   }, [router]);

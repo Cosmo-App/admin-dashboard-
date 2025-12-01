@@ -22,45 +22,47 @@ export const COLORS = {
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
+  console.log({ API_BASE_URL });
+
 export const API_ENDPOINTS = {
-  // Auth
+  // Auth (v2 endpoints with JWT)
   LOGIN: "/v2/auth/admin/login",
   LOGOUT: "/v2/auth/admin/logout",
   SESSION: "/v2/auth/admin/session",
+  REFRESH: "/v2/auth/admin/refresh",
+  CHANGE_PASSWORD: "/v2/auth/admin/change-password",
 
-  // Admin
+  // Admin (v2 with RBAC)
   ADMINS: "/v2/admin",
   ADMIN_SETUP: "/v2/admin/setup",
 
-  // Films
+  // Films (v2)
   FILMS: "/v2/films",
   FILM_POSTER: (id: string) => `/v2/films/${id}/poster`,
   FILM_SCENE_IMAGES: (id: string) => `/v2/films/${id}/scene-images`,
 
-  // Creators
+  // Creators (v2)
   CREATORS: "/v2/creators",
   CREATOR_FILMS: (id: string) => `/v2/creators/${id}/films`,
   CREATOR_PROFILE_PICTURE: (id: string) => `/v2/creators/${id}/profile-picture`,
   CREATOR_COVER_PHOTO: (id: string) => `/v2/creators/${id}/cover-photo`,
 
-  // Users
+  // Users (v2)
   USERS: "/v2/users",
   USER_PROFILE_PICTURE: (id: string) => `/v2/users/profile-picture/${id}`,
   USER_COVER_PHOTO: (id: string) => `/v2/users/cover-photo/${id}`,
 
-  // Playlists
+  // Playlists (v2)
   PLAYLISTS: "/v2/playlists",
 
-  // Metrics (to be added to backend)
+  // Metrics (v2)
   METRICS_OVERVIEW: "/v2/admin/metrics/overview",
   METRICS_USERS: "/v2/admin/metrics/users",
   METRICS_FILMS: "/v2/admin/metrics/films",
   METRICS_ACTIVITY: "/v2/admin/metrics/activity",
 
-  // Data (existing)
-  DATA_FILMS: "/v2/admin/data/films",
-  DATA_CREATORS: "/v2/admin/data/creators",
-  DATA_USERS: "/v2/admin/data/users",
+  // Roles (v2)
+  ROLES: "/v2/roles",
 } as const;
 
 /**

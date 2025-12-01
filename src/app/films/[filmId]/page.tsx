@@ -28,8 +28,8 @@ export default function ViewFilmPage() {
   const fetchFilm = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get(`/v2/films/${filmId}`);
-      setFilm(response.data);
+      const response = await api.get<Film>(`/v2/films/${filmId}`);
+      setFilm(response.data as Film);
     } catch (error) {
       console.error("Failed to fetch film:", error);
       router.push("/films");
@@ -172,7 +172,9 @@ export default function ViewFilmPage() {
                 <div className="flex items-start justify-between py-2 border-b border-secondary">
                   <span className="text-gray-400 text-sm">Creator</span>
                   <span className="text-white text-sm font-medium">
-                    {film.creatorId?.name || "Unknown"}
+                    {typeof film.creatorId === 'string' 
+                      ? film.creatorId 
+                      : film.creatorId?.name || "Unknown"}
                   </span>
                 </div>
                 <div className="flex items-start justify-between py-2 border-b border-secondary">

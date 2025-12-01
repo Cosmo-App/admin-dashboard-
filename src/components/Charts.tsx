@@ -114,7 +114,7 @@ export function GenreDistributionChart({ data, isLoading, height = 300 }: ChartP
     CHART_COLORS.secondary,
     CHART_COLORS.success,
     CHART_COLORS.warning,
-    CHART_COLORS.info,
+    CHART_COLORS.tertiary,
     "#8B5CF6",
     "#EC4899",
     "#F59E0B",
@@ -128,7 +128,7 @@ export function GenreDistributionChart({ data, isLoading, height = 300 }: ChartP
           cx="50%"
           cy="50%"
           labelLine={false}
-          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+          label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
           outerRadius={80}
           fill="#8884d8"
           dataKey="count"

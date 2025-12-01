@@ -56,32 +56,32 @@ export default function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <MetricCard
             title="Total Users"
-            value={metrics?.totals.users || 0}
-            change={metrics?.growth.users}
+            value={metrics?.totalUsers || 0}
+            change={metrics?.userGrowth}
             icon={Users}
             format="compact"
             isLoading={metricsLoading}
           />
           <MetricCard
             title="Total Films"
-            value={metrics?.totals.films || 0}
-            change={metrics?.growth.films}
+            value={metrics?.totalFilms || 0}
+            change={metrics?.filmGrowth}
             icon={Film}
             format="compact"
             isLoading={metricsLoading}
           />
           <MetricCard
             title="Total Creators"
-            value={metrics?.totals.creators || 0}
-            change={metrics?.growth.creators}
+            value={metrics?.totalCreators || 0}
+            change={0}
             icon={UserCircle}
             format="compact"
             isLoading={metricsLoading}
           />
           <MetricCard
             title="Total Playlists"
-            value={metrics?.totals.playlists || 0}
-            change={metrics?.growth.playlists}
+            value={metrics?.totalPlaylists || 0}
+            change={0}
             icon={List}
             format="compact"
             isLoading={metricsLoading}
@@ -92,7 +92,7 @@ export default function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <MetricCard
             title="Total Watch Time"
-            value={metrics?.watchTime.totalHours || 0}
+            value={metrics?.totalWatchTimeHours || 0}
             icon={Clock}
             format="time"
             suffix="hrs"
@@ -100,7 +100,7 @@ export default function HomePage() {
           />
           <MetricCard
             title="Avg. Watch Time/User"
-            value={metrics?.watchTime.avgMinutesPerUser || 0}
+            value={metrics?.avgWatchTimePerUser || 0}
             icon={TrendingUp}
             format="time"
             suffix="min"
@@ -108,7 +108,7 @@ export default function HomePage() {
           />
           <MetricCard
             title="Active Users (30d)"
-            value={metrics?.activeUsers || 0}
+            value={metrics?.activeUsersLast30Days || 0}
             icon={Users}
             format="compact"
             isLoading={metricsLoading}

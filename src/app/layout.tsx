@@ -21,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={sora.variable}>
+    <html lang="en" className={sora.className}>
       <body className="antialiased font-sans">
         <AuthProvider>{children}</AuthProvider>
       </body>

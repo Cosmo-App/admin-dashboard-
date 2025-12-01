@@ -20,9 +20,9 @@ export function useMetrics(options: UseMetricsOptions = {}) {
     setError(null);
 
     try {
-      const response = await api.get("/v2/admin/metrics/overview");
+      const response = await api.get<DashboardMetrics>("/v2/admin/metrics/overview");
       if (response.data) {
-        setMetrics(response.data);
+        setMetrics(response.data as DashboardMetrics);
       }
     } catch (err: any) {
       console.error("Failed to fetch metrics:", err);
@@ -63,9 +63,9 @@ export function useUserGrowth(days: number = 30) {
     setError(null);
 
     try {
-      const response = await api.get(`/v2/admin/metrics/user-growth?days=${days}`);
+      const response = await api.get<any[]>(`/v2/admin/metrics/user-growth?days=${days}`);
       if (response.data) {
-        setData(response.data);
+        setData(response.data as any[]);
       }
     } catch (err: any) {
       console.error("Failed to fetch user growth:", err);
@@ -92,9 +92,9 @@ export function useFilmUploads(months: number = 6) {
     setError(null);
 
     try {
-      const response = await api.get(`/v2/admin/metrics/film-uploads?months=${months}`);
+      const response = await api.get<any[]>(`/v2/admin/metrics/film-uploads?months=${months}`);
       if (response.data) {
-        setData(response.data);
+        setData(response.data as any[]);
       }
     } catch (err: any) {
       console.error("Failed to fetch film uploads:", err);
@@ -121,9 +121,9 @@ export function usePopularFilms(limit: number = 10) {
     setError(null);
 
     try {
-      const response = await api.get(`/v2/admin/metrics/popular-films?limit=${limit}`);
+      const response = await api.get<any[]>(`/v2/admin/metrics/top-films?limit=${limit}`);
       if (response.data) {
-        setFilms(response.data);
+        setFilms(response.data as any[]);
       }
     } catch (err: any) {
       console.error("Failed to fetch popular films:", err);
@@ -150,9 +150,9 @@ export function useGenreDistribution() {
     setError(null);
 
     try {
-      const response = await api.get("/v2/admin/metrics/genres");
+      const response = await api.get<any[]>("/v2/admin/metrics/genre-distribution");
       if (response.data) {
-        setData(response.data);
+        setData(response.data as any[]);
       }
     } catch (err: any) {
       console.error("Failed to fetch genre distribution:", err);
@@ -179,9 +179,9 @@ export function useRecentActivities(limit: number = 10) {
     setError(null);
 
     try {
-      const response = await api.get(`/v2/admin/metrics/activities?limit=${limit}`);
+      const response = await api.get<any[]>(`/v2/admin/metrics/recent-activity?limit=${limit}`);
       if (response.data) {
-        setActivities(response.data);
+        setActivities(response.data as any[]);
       }
     } catch (err: any) {
       console.error("Failed to fetch activities:", err);

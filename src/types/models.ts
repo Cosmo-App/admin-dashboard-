@@ -19,6 +19,7 @@ export interface User {
   instagram?: string;
   likedFilms: string[];
   watchedFilms: WatchedFilm[];
+  isActive?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -46,6 +47,7 @@ export interface Creator {
   handle?: string;
   description?: string;
   yearsOfExperience?: number;
+  isActive?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -63,12 +65,16 @@ export interface Film {
   logline?: string;
   production?: string;
   starring?: string[];
-  creatorId?: string;
+  creatorId?: string | Creator;
   genre?: string;
   rating?: string;
   views?: string;
   sceneImages?: string[];
   videoUrl?: string;
+  trailerUrl?: string;
+  duration?: number;
+  releaseYear?: number;
+  tags?: string[];
   // Legacy fields
   name?: string;
   description?: string;
@@ -105,6 +111,7 @@ export interface Admin {
   email: string;
   profilePicture?: string;
   assignedRoleId: string | Role;
+  role?: string;
   isActive?: boolean;
   lastLogin?: string;
   creatorId?: string;
@@ -181,11 +188,14 @@ export interface Activity {
   activityId?: string;
   adminId?: string;
   userId?: string;
+  adminEmail?: string;
   action: string;
   resource: string;
   resourceId: string;
+  resourceName?: string;
   details?: Record<string, any>;
   timestamp: string;
+  createdAt?: string;
 }
 
 // ============================================

@@ -60,7 +60,10 @@ export default function MobileNav() {
   const hasPermission = (item: NavItem): boolean => {
     if (!admin) return false;
     if (item.requiredRoles?.length) {
-      return item.requiredRoles.includes(admin.assignedRoleId?.name || "");
+      const roleName = typeof admin.assignedRoleId === 'string' 
+        ? admin.assignedRoleId 
+        : admin.assignedRoleId?.name || '';
+      return item.requiredRoles.includes(roleName);
     }
     return true;
   };
@@ -75,21 +78,28 @@ export default function MobileNav() {
     }
   };
 
+  const getRoleName = () => {
+    if (!admin?.assignedRoleId) return 'Admin';
+    return typeof admin.assignedRoleId === 'string' 
+      ? admin.assignedRoleId 
+      : admin.assignedRoleId.name;
+  };
+
   return (
     <>
       {/* Mobile Header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 h-16 bg-black border-b border-secondary">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 h-16 bg-black/80 backdrop-blur-xl border-b border-border">
         <div className="flex h-full items-center justify-between px-4">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-lg">C</span>
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="w-10 h-10 bg-linear-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+              <span className="text-white font-bold text-xl">C</span>
             </div>
-            <span className="text-white font-bold text-xl">Cosmic</span>
+            <span className="text-white font-bold text-xl tracking-tight">Cosmic</span>
           </Link>
 
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="p-2 hover:bg-secondary rounded-lg transition-colors"
+            className="p-2.5 hover:bg-secondary rounded-xl transition-all duration-200"
             aria-label="Toggle menu"
           >
             {isOpen ? (
@@ -104,7 +114,7 @@ export default function MobileNav() {
       {/* Mobile Menu Overlay */}
       {isOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-sm"
+          className="lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm animate-fade-in"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -112,59 +122,64 @@ export default function MobileNav() {
       {/* Mobile Menu Drawer */}
       <div
         className={cn(
-          "lg:hidden fixed top-16 right-0 bottom-0 z-40 w-64 bg-black border-l border-secondary transition-transform duration-300",
+          "lg:hidden fixed top-0 right-0 bottom-0 z-50 w-80 bg-secondary border-l border-border transition-transform duration-300 ease-out flex flex-col shadow-2xl",
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
         {/* Admin Info */}
         {admin && (
-          <div className="p-4 border-b border-secondary">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-white font-medium text-lg">
+          <div className="p-6 border-b border-border shrink-0">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-xl bg-linear-to-br from-primary/20 to-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-xl shrink-0">
                 {admin.name?.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-white text-sm font-medium truncate">{admin.name}</p>
-                <p className="text-gray-400 text-xs truncate">
-                  {admin.assignedRoleId?.name || "Admin"}
-                </p>
+                <p className="text-white text-base font-semibold truncate">{admin.name}</p>
+                <div className="mt-1 inline-flex items-center px-2 py-0.5 bg-primary/10 border border-primary/20 rounded-md">
+                  <span className="text-primary text-xs font-medium">
+                    {getRoleName()}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         )}
 
         {/* Navigation */}
-        <nav className="flex flex-col gap-1 p-3 mt-2">
+        <nav className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-1">
           {filteredNavItems.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href;
+            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
 
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200",
+                  "flex items-center gap-3.5 px-4 py-3.5 rounded-xl transition-all duration-200 group",
                   isActive
-                    ? "bg-primary text-white"
-                    : "text-gray-400 hover:bg-secondary hover:text-white"
+                    ? "bg-linear-to-r from-primary to-primary/90 text-white shadow-lg shadow-primary/20"
+                    : "text-gray-400 hover:bg-secondary-hover hover:text-white"
                 )}
               >
-                <Icon className="w-5 h-5 flex-shrink-0" />
-                <span className="font-medium text-sm">{item.label}</span>
+                <Icon className={cn(
+                  "shrink-0 transition-transform duration-200",
+                  isActive ? "w-5 h-5" : "w-5 h-5 group-hover:scale-110"
+                )} />
+                <span className="font-semibold text-sm">{item.label}</span>
               </Link>
             );
           })}
         </nav>
 
         {/* Logout Button */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-secondary">
+        <div className="p-4 border-t border-border shrink-0">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 text-primary hover:bg-secondary rounded-lg transition-colors"
+            className="w-full flex items-center gap-3.5 px-4 py-3.5 text-primary hover:bg-primary/10 rounded-xl transition-all duration-200 group"
           >
-            <LogOut className="w-5 h-5" />
-            <span className="font-medium text-sm">Logout</span>
+            <LogOut className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <span className="font-semibold text-sm">Logout</span>
           </button>
         </div>
       </div>

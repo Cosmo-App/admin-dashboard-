@@ -44,8 +44,8 @@ export default function EditProfilePage() {
   const fetchProfile = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get("/v2/auth/admin/me");
-      const adminData = response.data;
+      const response = await api.get<Admin>("/v2/auth/admin/me");
+      const adminData = response.data as Admin;
       setAdmin(adminData);
       setProfilePicture(adminData.profilePicture || "");
 
@@ -168,7 +168,9 @@ export default function EditProfilePage() {
                 <label className="block text-white text-sm font-medium mb-2">Role</label>
                 <input
                   type="text"
-                  value={admin?.role.toUpperCase() || ""}
+                  value={(admin?.role || (typeof admin?.assignedRoleId === 'string' 
+                    ? admin.assignedRoleId 
+                    : admin?.assignedRoleId?.name) || "").toUpperCase()}
                   disabled
                   className="w-full px-4 py-3 bg-secondary/20 border border-secondary rounded-lg text-gray-400 cursor-not-allowed"
                 />

@@ -22,8 +22,8 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get("/v2/users");
-      setUsers(response.data);
+      const response = await api.get<User[]>("/v2/users");
+      setUsers(response.data as User[] || []);
     } catch (error) {
       console.error("Failed to fetch users:", error);
     } finally {
@@ -173,6 +173,7 @@ export default function UsersPage() {
         <DataTable
           data={users}
           columns={columns}
+          keyField="userId"
           searchPlaceholder="Search users by username, email..."
           emptyMessage="No users found."
           isLoading={isLoading}

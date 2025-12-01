@@ -56,8 +56,8 @@ export default function EditFilmPage() {
   const fetchFilm = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get(`/v2/films/${filmId}`);
-      const filmData = response.data;
+      const response = await api.get<Film>(`/v2/films/${filmId}`);
+      const filmData = response.data as Film;
       setFilm(filmData);
       setPosterUrl(filmData.posterUrl || "");
       
