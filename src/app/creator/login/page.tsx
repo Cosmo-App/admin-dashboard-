@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/context/ToastContext";
+import { useCreatorAuth } from "@/context/CreatorAuthContext";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { api } from "@/lib/api";
 import { Film, LogIn, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
@@ -20,6 +20,8 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export default function CreatorLoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+  const toast = useToast();
+  const { login } = useCreatorAuth();
 
   const {
     register,
@@ -32,17 +34,22 @@ export default function CreatorLoginPage() {
   const onSubmit = async (data: LoginFormData) => {
     setIsSubmitting(true);
     try {
-      await api.post("/v2/auth/creator/login", {
-        email: data.email,
-        password: data.password,
-      });
+      console.log('[CreatorLogin] Submitting login...');
+      await login(data.email, data.password);
+      console.log('[CreatorLogin] Login successful, redirecting...');
+      toast.success("Welcome back! Redirecting to dashboard...");
       
-      router.push("/creator/dashboard");
+      // Small delay to ensure cookie is set and context updates
+      setTimeout(() => {
+        router.push("/creator/dashboard");
+      }, 100);
     } catch (error: any) {
-      console.error("Login failed:", error);
-      alert(error?.message || "Login failed. Please check your credentials.");
+      console.error("[CreatorLogin] Login failed:", error);
+      const errorMessage = error?.message || error?.response?.data?.message || "Login failed. Please check your credentials.";
+      toast.error(errorMessage);
     } finally {
-      setIsSubmitting(false);
+      // Always reset loading state unless we're redirecting
+      setTimeout(() => setIsSubmitting(false), 150);
     }
   };
 

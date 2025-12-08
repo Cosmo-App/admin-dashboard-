@@ -6,6 +6,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { api } from "@/lib/api";
+import { useToast } from "@/context/ToastContext";
+import { useCreatorAuth } from "@/context/CreatorAuthContext";
 import { ArrowLeft, Upload, Lock } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -48,6 +50,8 @@ export default function CreatorProfile() {
   const [activeTab, setActiveTab] = useState<"profile" | "password">("profile");
   const [uploadingImage, setUploadingImage] = useState(false);
   const router = useRouter();
+  const toast = useToast();
+  const { refreshSession } = useCreatorAuth();
 
   const {
     register: registerProfile,
@@ -95,10 +99,11 @@ export default function CreatorProfile() {
     try {
       const response = await api.put<{ creator: Creator }>("/v2/auth/creator/profile", data);
       setCreator(response.data.creator);
-      alert("Profile updated successfully!");
+      await refreshSession(); // Refresh the auth context
+      toast.success("Profile updated successfully!");
     } catch (error: any) {
       console.error("Failed to update profile:", error);
-      alert(error.response?.data?.message || "Failed to update profile");
+      toast.error(error.response?.data?.message || "Failed to update profile");
     }
   };
 
@@ -108,11 +113,11 @@ export default function CreatorProfile() {
         currentPassword: data.currentPassword,
         newPassword: data.newPassword,
       });
-      alert("Password changed successfully!");
+      toast.success("Password changed successfully!");
       resetPassword();
     } catch (error: any) {
       console.error("Failed to change password:", error);
-      alert(error.response?.data?.message || "Failed to change password");
+      toast.error(error.response?.data?.message || "Failed to change password");
     }
   };
 
@@ -130,10 +135,11 @@ export default function CreatorProfile() {
         formData
       );
       setCreator(response.data.creator);
-      alert("Profile picture updated successfully!");
+      await refreshSession(); // Refresh the auth context
+      toast.success("Profile picture updated successfully!");
     } catch (error: any) {
       console.error("Failed to upload image:", error);
-      alert(error.response?.data?.message || "Failed to upload image");
+      toast.error(error.response?.data?.message || "Failed to upload image");
     } finally {
       setUploadingImage(false);
     }

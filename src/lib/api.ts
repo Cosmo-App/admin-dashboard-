@@ -59,10 +59,17 @@ apiClient.interceptors.response.use(
 
       console.error(`[API] Error ${status}:`, data);
 
-      // Handle 401 Unauthorized - redirect to login
+      // Handle 401 Unauthorized - redirect to appropriate login
       if (status === 401) {
         if (typeof window !== "undefined") {
-          window.location.href = "/login";
+          // Check if we're on a creator route
+          const isCreatorRoute = window.location.pathname.startsWith("/creator");
+          const loginPath = isCreatorRoute ? "/creator/login" : "/login";
+          
+          // Only redirect if not already on a login page
+          if (!window.location.pathname.includes("/login")) {
+            window.location.href = loginPath;
+          }
         }
       }
 

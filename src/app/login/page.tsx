@@ -38,7 +38,7 @@ function LoginContent() {
 
     try {
       await login(data.email, data.password);
-      const redirect = searchParams.get("redirect") || "/";
+      const redirect = searchParams.get("redirect") || "/dashboard";
       router.push(redirect);
     } catch (err: any) {
       console.error("Login error:", err);

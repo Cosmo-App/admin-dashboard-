@@ -11,17 +11,26 @@ import { api } from "@/lib/api";
 import { FILM_GENRES } from "@/lib/constants";
 import { ArrowLeft, Save } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/context/ToastContext";
 
 const filmSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().optional(),
+  title: z.string().min(1, "Title is required").max(200, "Title is too long"),
+  description: z.string().min(10, "Description must be at least 10 characters"),
   genre: z.string().min(1, "Genre is required"),
-  videoUrl: z.string().url("Must be a valid URL"),
-  posterUrl: z.string().optional(),
+  videoUrl: z.string().min(1, "Video URL is required").refine(
+    (url) => {
+      // Check if it's a valid Vimeo URL or numeric ID
+      const vimeoRegex = /^(https?:\/\/)?(www\.)?(vimeo\.com\/|player\.vimeo\.com\/video\/)?(\d+)$/;
+      const numericId = /^\d+$/;
+      return vimeoRegex.test(url) || numericId.test(url);
+    },
+    { message: "Must be a valid Vimeo URL or Vimeo video ID (numeric)" }
+  ),
+  posterUrl: z.string().min(1, "Poster image is required"),
   trailerUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  duration: z.number().min(1, "Duration must be greater than 0").optional(),
-  releaseYear: z.number().min(1900).max(new Date().getFullYear() + 5).optional(),
-  rating: z.string().optional(),
+  duration: z.number().min(1, "Duration is required and must be greater than 0"),
+  releaseYear: z.number().min(1900, "Invalid year").max(new Date().getFullYear() + 5, "Year cannot be too far in the future"),
+  rating: z.string().min(1, "Rating is required"),
   tags: z.string().optional(),
 });
 
@@ -31,6 +40,7 @@ export default function CreateFilmPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [posterUrl, setPosterUrl] = useState<string>("");
   const router = useRouter();
+  const toast = useToast();
 
   const {
     register,
@@ -42,21 +52,68 @@ export default function CreateFilmPage() {
   });
 
   const onSubmit = async (data: FilmFormData) => {
+    // Additional validation checks
+    if (!posterUrl || posterUrl.trim() === "") {
+      toast.error("Please upload a poster image before submitting");
+      return;
+    }
+
+    if (!data.videoUrl || data.videoUrl.trim() === "") {
+      toast.error("Video URL is required");
+      return;
+    }
+
+    if (!data.title || data.title.trim() === "") {
+      toast.error("Film title is required");
+      return;
+    }
+
+    if (!data.genre) {
+      toast.error("Please select a genre");
+      return;
+    }
+
+    if (!data.description || data.description.trim().length < 10) {
+      toast.error("Please provide a description (at least 10 characters)");
+      return;
+    }
+
+    if (!data.duration || data.duration < 1) {
+      toast.error("Please enter a valid duration in minutes");
+      return;
+    }
+
+    if (!data.releaseYear) {
+      toast.error("Please enter the release year");
+      return;
+    }
+
+    if (!data.rating) {
+      toast.error("Please select a rating");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const filmData = {
         ...data,
-        posterUrl: posterUrl || undefined,
-        duration: data.duration || undefined,
-        releaseYear: data.releaseYear || undefined,
+        posterUrl: posterUrl,
+        duration: data.duration,
+        releaseYear: data.releaseYear,
         tags: data.tags ? data.tags.split(",").map((t) => t.trim()) : [],
       };
 
+      console.log("Submitting film data:", filmData);
       await api.post("/v2/films", filmData);
-      router.push("/films");
+      
+      toast.success("Film created successfully!");
+      setTimeout(() => {
+        router.push("/films");
+      }, 1000);
     } catch (error: any) {
       console.error("Failed to create film:", error);
-      alert(error.response?.data?.error || "Failed to create film");
+      const errorMessage = error.response?.data?.error || error.message || "Failed to create film. Please check all fields and try again.";
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -83,7 +140,9 @@ export default function CreateFilmPage() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Poster Upload */}
           <div className="bg-[#1a1a1a] border border-secondary rounded-lg p-6">
-            <h3 className="text-white text-lg font-semibold mb-4">Poster Image</h3>
+            <h3 className="text-white text-lg font-semibold mb-4">
+              Poster Image <span className="text-primary">*</span>
+            </h3>
             <ImageUpload
               value={posterUrl}
               onChange={(url) => {
@@ -96,6 +155,9 @@ export default function CreateFilmPage() {
               }}
               label="Upload poster (16:9 recommended)"
             />
+            {!posterUrl && (
+              <p className="mt-2 text-gray-400 text-xs">Poster image is required</p>
+            )}
           </div>
 
           {/* Basic Info */}
@@ -149,7 +211,9 @@ export default function CreateFilmPage() {
 
               {/* Release Year */}
               <div>
-                <label className="block text-white text-sm font-medium mb-2">Release Year</label>
+                <label className="block text-white text-sm font-medium mb-2">
+                  Release Year <span className="text-primary">*</span>
+                </label>
                 <input
                   {...register("releaseYear", { valueAsNumber: true })}
                   type="number"
@@ -170,7 +234,7 @@ export default function CreateFilmPage() {
               {/* Duration */}
               <div>
                 <label className="block text-white text-sm font-medium mb-2">
-                  Duration (minutes)
+                  Duration (minutes) <span className="text-primary">*</span>
                 </label>
                 <input
                   {...register("duration", { valueAsNumber: true })}
@@ -190,10 +254,16 @@ export default function CreateFilmPage() {
 
               {/* Rating */}
               <div>
-                <label className="block text-white text-sm font-medium mb-2">Rating</label>
+                <label className="block text-white text-sm font-medium mb-2">
+                  Rating <span className="text-primary">*</span>
+                </label>
                 <select
                   {...register("rating")}
-                  className="w-full px-4 py-3 bg-black border border-secondary rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className={cn(
+                    "w-full px-4 py-3 bg-black border rounded-lg text-white",
+                    "focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
+                    errors.rating ? "border-primary" : "border-secondary"
+                  )}
                 >
                   <option value="">Select rating</option>
                   <option value="G">G</option>
@@ -202,17 +272,29 @@ export default function CreateFilmPage() {
                   <option value="R">R</option>
                   <option value="NC-17">NC-17</option>
                 </select>
+                {errors.rating && (
+                  <p className="mt-1.5 text-primary text-xs">{errors.rating.message}</p>
+                )}
               </div>
 
               {/* Description */}
               <div className="md:col-span-2">
-                <label className="block text-white text-sm font-medium mb-2">Description</label>
+                <label className="block text-white text-sm font-medium mb-2">
+                  Description <span className="text-primary">*</span>
+                </label>
                 <textarea
                   {...register("description")}
                   rows={4}
-                  placeholder="Enter film description"
-                  className="w-full px-4 py-3 bg-black border border-secondary rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                  placeholder="Enter film description (minimum 10 characters)"
+                  className={cn(
+                    "w-full px-4 py-3 bg-black border rounded-lg text-white placeholder-gray-500",
+                    "focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none",
+                    errors.description ? "border-primary" : "border-secondary"
+                  )}
                 />
+                {errors.description && (
+                  <p className="mt-1.5 text-primary text-xs">{errors.description.message}</p>
+                )}
               </div>
 
               {/* Tags */}
@@ -237,12 +319,12 @@ export default function CreateFilmPage() {
               {/* Video URL */}
               <div>
                 <label className="block text-white text-sm font-medium mb-2">
-                  Video URL <span className="text-primary">*</span>
+                  Video URL / Vimeo ID <span className="text-primary">*</span>
                 </label>
                 <input
                   {...register("videoUrl")}
-                  type="url"
-                  placeholder="https://vimeo.com/..."
+                  type="text"
+                  placeholder="1069440843 or https://vimeo.com/1069440843"
                   className={cn(
                     "w-full px-4 py-3 bg-black border rounded-lg text-white placeholder-gray-500",
                     "focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
@@ -253,7 +335,7 @@ export default function CreateFilmPage() {
                   <p className="mt-1.5 text-primary text-xs">{errors.videoUrl.message}</p>
                 )}
                 <p className="mt-1.5 text-gray-500 text-xs">
-                  Vimeo, YouTube, or direct video URL
+                  Enter Vimeo video ID (numbers only) or full Vimeo URL
                 </p>
               </div>
 

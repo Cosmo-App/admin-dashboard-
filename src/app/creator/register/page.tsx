@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/context/ToastContext";
+import { useCreatorAuth } from "@/context/CreatorAuthContext";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { api } from "@/lib/api";
 import { Film, Clapperboard, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
@@ -27,6 +27,8 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 export default function CreatorRegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+  const toast = useToast();
+  const { register: registerCreator } = useCreatorAuth();
 
   const {
     register,
@@ -39,7 +41,8 @@ export default function CreatorRegisterPage() {
   const onSubmit = async (data: RegisterFormData) => {
     setIsSubmitting(true);
     try {
-      await api.post("/v2/auth/creator/register", {
+      console.log('[CreatorRegister] Submitting registration...');
+      await registerCreator({
         name: data.name,
         email: data.email,
         password: data.password,
@@ -47,13 +50,20 @@ export default function CreatorRegisterPage() {
         bio: data.bio,
       });
       
-      alert("Registration successful! Redirecting to dashboard...");
-      router.push("/creator/dashboard");
+      console.log('[CreatorRegister] Registration successful, redirecting...');
+      toast.success("Registration successful! Welcome to Cosmic.");
+      
+      // Small delay to ensure cookie is set and context updates
+      setTimeout(() => {
+        router.push("/creator/dashboard");
+      }, 100);
     } catch (error: any) {
-      console.error("Registration failed:", error);
-      alert(error?.message || "Registration failed");
+      console.error("[CreatorRegister] Registration failed:", error);
+      const errorMessage = error?.message || error?.response?.data?.message || "Registration failed. Please try again.";
+      toast.error(errorMessage);
     } finally {
-      setIsSubmitting(false);
+      // Always reset loading state unless we're redirecting
+      setTimeout(() => setIsSubmitting(false), 150);
     }
   };
 

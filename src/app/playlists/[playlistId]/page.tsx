@@ -85,14 +85,21 @@ export default function PlaylistDetailPage() {
 
   const fetchFilms = async (filmIds: string[]) => {
     try {
+      console.log('Fetching films for IDs:', filmIds);
+      
       // Fetch each film individually
       const filmPromises = filmIds.map((filmId) =>
-        api.get<Film>(`/v2/admin/films/${filmId}`).catch(() => null)
+        api.get<Film>(`/v2/films/${filmId}`).catch((err) => {
+          console.error(`Failed to fetch film ${filmId}:`, err);
+          return null;
+        })
       );
       const filmResponses = await Promise.all(filmPromises);
       const filmsData = filmResponses
         .filter((res) => res !== null)
         .map((res) => res!.data as Film);
+      
+      console.log('Fetched films:', filmsData);
       setFilms(filmsData);
     } catch (error) {
       console.error("Failed to fetch films:", error);

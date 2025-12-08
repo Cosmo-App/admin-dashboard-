@@ -151,6 +151,14 @@ export default function PlaylistsPage() {
       ),
     },
     {
+      key: "views",
+      label: "Views",
+      sortable: true,
+      render: (playlist: Playlist) => (
+        <span className="text-white">{(playlist.views || 0).toLocaleString()}</span>
+      ),
+    },
+    {
       key: "isPublic",
       label: "Visibility",
       sortable: true,
@@ -164,7 +172,7 @@ export default function PlaylistsPage() {
           ) : (
             <>
               <EyeOff className="w-4 h-4 text-gray-400" />
-              <span className="text-gray-400 text-sm">Private</span>
+              <span className="text-gray-400 text-sm font-medium">Private</span>
             </>
           )}
         </div>
@@ -182,14 +190,6 @@ export default function PlaylistsPage() {
         ) : (
           <span className="text-gray-500 text-sm">—</span>
         ),
-    },
-    {
-      key: "views",
-      label: "Views",
-      sortable: true,
-      render: (playlist: Playlist) => (
-        <span className="text-white">{playlist.views?.toLocaleString() || 0}</span>
-      ),
     },
     {
       key: "createdAt",
