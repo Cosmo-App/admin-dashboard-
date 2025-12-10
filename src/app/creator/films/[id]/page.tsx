@@ -56,8 +56,8 @@ export default function CreatorEditFilm() {
   const fetchFilm = async () => {
     try {
       setIsLoading(true);
-      const response = await api.get(`/v2/films/${params.id}`);
-      const filmData = response.data?.data || response.data;
+      const response = await api.get<FilmData>(`/v2/films/${params.id}`);
+      const filmData = response.data;
       
       // Verify ownership
       if (filmData.creatorId !== creator?.creatorId) {

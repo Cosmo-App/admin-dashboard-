@@ -66,11 +66,11 @@ export function CreatorAuthProvider({ children }: { children: React.ReactNode })
       // Just try to fetch the session and let the backend validate
       
       console.log('[CreatorAuth] Fetching session from backend...');
-      const response = await api.get("/v2/auth/creator/session");
+      const response = await api.get<{ creator: Creator }>("/v2/auth/creator/session");
       console.log('[CreatorAuth] Session response:', response);
       
       // Backend wraps response in { message, data, success }
-      const responseData = response?.data?.data || response?.data;
+      const responseData = response.data;
       
       if (responseData?.creator) {
         console.log('[CreatorAuth] Session found for:', responseData.creator.email);
@@ -92,7 +92,7 @@ export function CreatorAuthProvider({ children }: { children: React.ReactNode })
   const login = useCallback(async (email: string, password: string) => {
     try {
       console.log('[CreatorAuth] Attempting login for:', email);
-      const response = await api.post("/v2/auth/creator/login", { 
+      const response = await api.post<{ creator: Creator; token: string }>("/v2/auth/creator/login", { 
         email, 
         password 
       });
@@ -104,7 +104,7 @@ export function CreatorAuthProvider({ children }: { children: React.ReactNode })
       }
       
       // Backend wraps response in { message, data, success }
-      const responseData = response.data.data || response.data;
+      const responseData = response.data;
       console.log('[CreatorAuth] Parsed response data:', responseData);
       
       if (responseData?.creator && responseData?.token) {
@@ -127,7 +127,7 @@ export function CreatorAuthProvider({ children }: { children: React.ReactNode })
   const register = useCallback(async (data: RegisterData) => {
     try {
       console.log('[CreatorAuth] Attempting registration for:', data.email);
-      const response = await api.post("/v2/auth/creator/register", data);
+      const response = await api.post<{ creator: Creator; token: string }>("/v2/auth/creator/register", data);
 
       console.log('[CreatorAuth] Full registration response:', response);
       
@@ -136,7 +136,7 @@ export function CreatorAuthProvider({ children }: { children: React.ReactNode })
       }
       
       // Backend wraps response in { message, data, success }
-      const responseData = response.data.data || response.data;
+      const responseData = response.data;
       console.log('[CreatorAuth] Parsed response data:', responseData);
       
       if (responseData?.creator && responseData?.token) {

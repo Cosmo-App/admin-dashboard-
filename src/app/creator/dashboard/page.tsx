@@ -48,8 +48,7 @@ export default function CreatorDashboard() {
       const filmsResponse = await api.get<FilmData[]>(`/v2/films`);
       
       // Handle response structure: { message, data: [...], success }
-      const filmsList = filmsResponse.data?.data || filmsResponse.data || [];
-      const allFilms = Array.isArray(filmsList) ? filmsList : [];
+      const allFilms = Array.isArray(filmsResponse.data) ? filmsResponse.data : [];
       
       const myFilms = allFilms.filter((f: any) => f.creatorId === creator.creatorId);
       console.log('[CreatorDashboard] Found films:', myFilms.length);
@@ -143,7 +142,7 @@ export default function CreatorDashboard() {
               </div>
               <div className="min-w-0">
                 <h1 className="text-base sm:text-xl font-bold text-white truncate">Creator Dashboard</h1>
-                <p className="text-[10px] sm:text-xs text-gray-400 truncate hidden sm:block">{creator.email}</p>
+                <p className="text-[10px] sm:text-xs text-gray-400 truncate hidden sm:block">{creator?.email}</p>
               </div>
             </div>
 
@@ -177,27 +176,27 @@ export default function CreatorDashboard() {
           <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
             <div className="flex items-center gap-3 sm:gap-6 w-full sm:w-auto">
               <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-full bg-gradient-to-br from-primary to-blue-500 overflow-hidden flex-shrink-0 border-2 sm:border-4 border-primary/20 shadow-xl shadow-primary/20">
-                {creator.profilePicture ? (
+                {creator?.profilePicture ? (
                   <Image
                     src={creator.profilePicture}
-                    alt={creator.name}
+                    alt={creator.name || 'Creator'}
                     width={96}
                     height={96}
                     className="object-cover w-full h-full"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-xl sm:text-2xl lg:text-3xl font-bold text-white">
-                    {creator.name.charAt(0).toUpperCase()}
+                    {creator?.name?.charAt(0).toUpperCase() || 'C'}
                   </div>
                 )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-1 sm:mb-2">
-                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white truncate">{creator.name}</h2>
+                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white truncate">{creator?.name}</h2>
                   <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-primary/20 text-primary text-[10px] sm:text-xs font-semibold rounded-full border border-primary/30 whitespace-nowrap">Creator</span>
                 </div>
-                {creator.title && <p className="text-gray-400 text-sm sm:text-base lg:text-lg mb-0.5 sm:mb-1 truncate">{creator.title}</p>}
-                {creator.bio && <p className="text-gray-500 text-xs sm:text-sm line-clamp-2 sm:line-clamp-2">{creator.bio}</p>}
+                {creator?.title && <p className="text-gray-400 text-sm sm:text-base lg:text-lg mb-0.5 sm:mb-1 truncate">{creator.title}</p>}
+                {creator?.bio && <p className="text-gray-500 text-xs sm:text-sm line-clamp-2 sm:line-clamp-2">{creator.bio}</p>}
               </div>
             </div>
             <Link
