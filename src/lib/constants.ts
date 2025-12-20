@@ -20,9 +20,9 @@ export const COLORS = {
  * API Configuration
  */
 export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5001";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
-  console.log('[API] Using base URL:', API_BASE_URL);
+  console.log({ API_BASE_URL });
 
 export const API_ENDPOINTS = {
   // Auth (v2 endpoints with JWT)

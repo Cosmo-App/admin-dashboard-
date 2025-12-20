@@ -5,7 +5,7 @@ import { SESSION_COOKIE_NAME } from "@/lib/constants";
 const CREATOR_COOKIE_NAME = "cosmic_creator_token";
 
 // Routes that don't require authentication
-const publicRoutes = ["/", "/login", "/creator/login", "/creator/register"];
+const publicRoutes = ["/", "/login", "/creator/login", "/creator/register", "/users/privacy", "/users/support"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
