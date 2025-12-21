@@ -5,7 +5,7 @@ import { SESSION_COOKIE_NAME } from "@/lib/constants";
 const CREATOR_COOKIE_NAME = "cosmic_creator_token";
 
 // Routes that don't require authentication
-const publicRoutes = ["/", "/login", "/creator/login", "/creator/register", "/users/privacy", "/users/support"];
+const publicRoutes = ["/login", "/creator/login", "/creator/register", "/users/privacy", "/users/support"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -13,9 +13,8 @@ export function middleware(request: NextRequest) {
   const creatorToken = request.cookies.get(CREATOR_COOKIE_NAME)?.value;
 
   // Check if the route is public
-  // Special handling for root path to avoid matching everything with startsWith("/")
   const isPublicRoute = pathname === "/" || publicRoutes.some((route) => 
-    route !== "/" && pathname.startsWith(route)
+    pathname.startsWith(route)
   );
 
   // Creator routes

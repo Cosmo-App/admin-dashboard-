@@ -8,6 +8,7 @@ import { z } from "zod";
 import { Eye, EyeOff, AlertCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/context/ToastContext";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -23,6 +24,7 @@ function LoginContent() {
   const { login } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const toast = useToast();
 
   const {
     register,
@@ -38,8 +40,9 @@ function LoginContent() {
 
     try {
       await login(data.email, data.password);
+      toast.success("Welcome back! Login successful.", 3000);
       const redirect = searchParams.get("redirect") || "/dashboard";
-      router.push(redirect);
+      setTimeout(() => router.push(redirect), 500); // Small delay for toast to show
     } catch (err: any) {
       console.error("Login error:", err);
       // Error structure from API interceptor: { message, code, details }
@@ -52,25 +55,29 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-zinc-950 via-black to-zinc-900 flex items-center justify-center p-4 sm:p-6 lg:p-8">
-      <div className="w-full max-w-md animate-slide-in-up">
+    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-black to-zinc-900 relative overflow-hidden flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      {/* Animated Background Elements */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-primary/5 to-transparent rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-blue-500/5 to-transparent rounded-full blur-3xl animate-pulse" style={{animationDelay: "1.5s"}} />
+      
+      <div className="w-full max-w-md relative z-10 animate-slide-in-up">
         {/* Logo */}
         <div className="flex justify-center mb-10">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-linear-to-br from-primary via-primary to-red-700 rounded-2xl flex items-center justify-center shadow-2xl shadow-primary/30 ring-2 ring-primary/20">
-              <span className="text-white font-bold text-3xl sm:text-4xl">C</span>
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-primary via-primary to-red-700 rounded-2xl flex items-center justify-center shadow-2xl shadow-primary/30 ring-2 ring-primary/20 animate-pulse" style={{animationDuration: "3s"}}>
+              <span className="text-white font-bold text-3xl sm:text-4xl drop-shadow-lg">C</span>
             </div>
             <div>
-              <h1 className="text-white font-bold text-4xl sm:text-5xl tracking-tight">Cosmic</h1>
+              <h1 className="text-white font-bold text-4xl sm:text-5xl tracking-tight drop-shadow-lg">Cosmic</h1>
               <p className="text-zinc-400 text-sm font-medium tracking-wide">Admin Dashboard</p>
             </div>
           </div>
         </div>
 
         {/* Login Form */}
-        <div className="bg-zinc-900/70 backdrop-blur-xl border border-zinc-800 rounded-3xl p-8 sm:p-10 shadow-2xl ring-1 ring-white/5">
+        <div className="bg-gradient-to-br from-zinc-900/70 to-zinc-900/50 backdrop-blur-xl border border-zinc-800 rounded-3xl p-8 sm:p-10 shadow-2xl ring-1 ring-white/5 hover:ring-white/10 transition-all duration-300">
           <div className="mb-8">
-            <h2 className="text-white text-3xl sm:text-4xl font-bold mb-3">Welcome back</h2>
+            <h2 className="text-white text-3xl sm:text-4xl font-bold mb-3 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Welcome back</h2>
             <p className="text-zinc-400 text-base sm:text-lg">
               Sign in to your admin account to continue
             </p>
@@ -162,21 +169,24 @@ function LoginContent() {
               type="submit"
               disabled={isLoading}
               className={cn(
-                "w-full py-4 bg-linear-to-r from-primary via-primary to-red-700 text-white font-bold rounded-xl",
-                "hover:from-red-700 hover:via-primary hover:to-primary",
+                "w-full py-4 bg-gradient-to-r from-primary via-primary to-red-700 text-white font-bold rounded-xl",
+                "hover:shadow-2xl hover:shadow-primary/40 hover:scale-[1.02]",
                 "active:scale-[0.98] shadow-xl shadow-primary/30",
-                "transition-all duration-300 text-base",
-                "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-primary disabled:hover:to-red-700 disabled:active:scale-100"
+                "transition-all duration-300 text-base relative overflow-hidden group",
+                "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               )}
             >
-              {isLoading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Signing in...</span>
-                </span>
-              ) : (
-                "Sign in to Dashboard"
-              )}
+              <span className="absolute inset-0 bg-gradient-to-r from-red-700 via-primary to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <span className="relative z-10">
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Signing in...</span>
+                  </span>
+                ) : (
+                  "Sign in to Dashboard"
+                )}
+              </span>
             </button>
           </form>
 

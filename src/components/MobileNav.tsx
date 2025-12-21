@@ -173,6 +173,7 @@ export default function MobileNav() {
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={true}
                 className={cn(
                   "flex items-center gap-3.5 px-4 py-3.5 rounded-xl transition-all duration-200 group",
                   isActive

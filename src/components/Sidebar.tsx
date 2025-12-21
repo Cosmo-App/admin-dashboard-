@@ -166,6 +166,7 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
             <Link
               key={item.href}
               href={item.href}
+              prefetch={true}
               className={cn(
                 "flex items-center gap-3.5 px-4 py-3.5 rounded-xl transition-all duration-200 group relative",
                 isActive

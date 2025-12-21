@@ -10,25 +10,31 @@ import { api } from "@/lib/api";
 import { Admin } from "@/types/models";
 
 export default function SettingsPage() {
-  const { admin, updateAdmin } = useAuth();
+  const { admin, updateAdmin, isLoading: authLoading } = useAuth();
   const toast = useToast();
   const [activeTab, setActiveTab] = useState("general");
   const [isLoading, setIsLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [formData, setFormData] = useState({
-    name: admin?.name || "",
-    email: admin?.email || "",
+    name: "",
+    email: "",
   });
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [changingPassword, setChangingPassword] = useState(false);
 
-  // Sync formData when admin changes (after profile updates)
+  // Initialize and sync formData when admin loads or changes
   useEffect(() => {
-    if (admin) {
+    if (admin && !authLoading) {
       setFormData({
         name: admin.name || "",
         email: admin.email || "",
       });
     }
-  }, [admin]);
+  }, [admin, authLoading]);
 
   const tabs = [
     { id: "general", label: "General", icon: User },
@@ -45,13 +51,50 @@ export default function SettingsPage() {
       
       if (response?.data?.admin) {
         updateAdmin(response.data.admin);
-        toast.success("Profile updated successfully!");
+        toast.success("✨ Profile updated successfully! Your changes have been saved.", 4000);
       }
     } catch (error: any) {
       console.error("Failed to update profile:", error);
       toast.error(error.response?.data?.message || "Failed to update profile");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
+      toast.error("Please fill in all password fields");
+      return;
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      toast.error("New password must be at least 6 characters");
+      return;
+    }
+
+    setChangingPassword(true);
+    try {
+      await api.put("/v2/auth/admin/change-password", {
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+      });
+      
+      toast.success("🔒 Password changed successfully!", 3000);
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    } catch (error: any) {
+      console.error("Failed to change password:", error);
+      toast.error(error.response?.data?.message || "Failed to change password");
+    } finally {
+      setChangingPassword(false);
     }
   };
 
@@ -71,7 +114,7 @@ export default function SettingsPage() {
       
       if (response?.data?.admin) {
         updateAdmin(response.data.admin);
-        toast.success("Profile picture updated successfully!");
+        toast.success("📸 Profile picture updated! Looking good!", 3000);
       }
     } catch (error: any) {
       console.error("Failed to upload image:", error);
@@ -237,23 +280,49 @@ export default function SettingsPage() {
                       <label className="text-sm font-medium text-gray-400">Current Password</label>
                       <input
                         type="password"
-                        className="w-full px-4 py-2.5 bg-black border border-secondary rounded-lg text-white focus:outline-none focus:border-primary transition-colors"
+                        value={passwordData.currentPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                        placeholder="Enter current password"
+                        className="w-full px-4 py-2.5 bg-black border border-secondary rounded-lg text-white focus:outline-none focus:border-primary transition-colors placeholder:text-gray-600"
                       />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-400">New Password</label>
                       <input
                         type="password"
-                        className="w-full px-4 py-2.5 bg-black border border-secondary rounded-lg text-white focus:outline-none focus:border-primary transition-colors"
+                        value={passwordData.newPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                        placeholder="Enter new password (min 6 characters)"
+                        className="w-full px-4 py-2.5 bg-black border border-secondary rounded-lg text-white focus:outline-none focus:border-primary transition-colors placeholder:text-gray-600"
                       />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-400">Confirm New Password</label>
                       <input
                         type="password"
-                        className="w-full px-4 py-2.5 bg-black border border-secondary rounded-lg text-white focus:outline-none focus:border-primary transition-colors"
+                        value={passwordData.confirmPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                        placeholder="Confirm new password"
+                        className="w-full px-4 py-2.5 bg-black border border-secondary rounded-lg text-white focus:outline-none focus:border-primary transition-colors placeholder:text-gray-600"
                       />
                     </div>
+                    <button
+                      onClick={handlePasswordChange}
+                      disabled={changingPassword}
+                      className="mt-4 flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-xl font-medium transition-all shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {changingPassword ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>Changing Password...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Lock className="w-5 h-5" />
+                          <span>Change Password</span>
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
 

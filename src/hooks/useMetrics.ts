@@ -21,8 +21,21 @@ export function useMetrics(options: UseMetricsOptions = {}) {
 
     try {
       const response = await api.get<DashboardMetrics>("/v2/admin/metrics/overview");
-      if (response.data) {
+      if (response?.data) {
         setMetrics(response.data as DashboardMetrics);
+      } else {
+        // Set default empty metrics if no data
+        setMetrics({
+          totalUsers: 0,
+          totalCreators: 0,
+          totalFilms: 0,
+          totalPlaylists: 0,
+          totalWatchTimeHours: 0,
+          avgWatchTimePerUser: 0,
+          userGrowth: 0,
+          filmGrowth: 0,
+          activeUsersLast30Days: 0,
+        });
       }
     } catch (err: any) {
       console.error("Failed to fetch metrics:", err);

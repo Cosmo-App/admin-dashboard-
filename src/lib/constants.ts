@@ -22,8 +22,6 @@ export const COLORS = {
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
-  console.log({ API_BASE_URL });
-
 export const API_ENDPOINTS = {
   // Auth (v2 endpoints with JWT)
   LOGIN: "/v2/auth/admin/login",

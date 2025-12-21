@@ -2,6 +2,7 @@
 
 import React from "react";
 import DashboardLayout from "@/components/DashboardLayout";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import MetricCard from "@/components/MetricCard";
 import {
   UserGrowthChart,
@@ -26,7 +27,7 @@ export default function HomePage() {
   const { admin } = useAuth();
   const { metrics, isLoading: metricsLoading, refetch: refetchMetrics } = useMetrics({
     autoFetch: true,
-    interval: 60000, // Refresh every minute
+    interval: 120000, // Refresh every 2 minutes (reduced frequency)
   });
   const { data: userGrowthData, isLoading: userGrowthLoading } = useUserGrowth(30);
   const { data: filmUploadsData, isLoading: filmUploadsLoading } = useFilmUploads(6);
@@ -42,12 +43,12 @@ export default function HomePage() {
   };
 
   return (
-    <DashboardLayout>
-      <div className="space-y-8 pb-8">
-        {/* Welcome Header */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#1a1a1a] to-[#0a0a0a] border border-secondary/30 p-8 md:p-10 shadow-2xl shadow-black/50">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -ml-20 -mb-20 pointer-events-none"></div>
+    <ErrorBoundary>
+      <DashboardLayout>
+        <div className="space-y-8 pb-8">{/* Welcome Header */}
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1a1a1a] via-[#0f0f0f] to-[#0a0a0a] border border-secondary/30 p-8 md:p-10 shadow-2xl shadow-black/50 backdrop-blur-sm">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-primary/10 to-transparent rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none animate-pulse"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-blue-500/10 to-transparent rounded-full blur-3xl -ml-20 -mb-20 pointer-events-none animate-pulse" style={{animationDelay: "1s"}}></div>
           
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
@@ -232,6 +233,7 @@ export default function HomePage() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+      </DashboardLayout>
+    </ErrorBoundary>
   );
 }

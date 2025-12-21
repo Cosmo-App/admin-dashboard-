@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Bell, LogOut, User, Settings, ChevronDown } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 import { cn } from "@/lib/utils";
 
 export default function Header() {
@@ -11,6 +12,7 @@ export default function Header() {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const toast = useToast();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -25,9 +27,12 @@ export default function Header() {
 
   const handleLogout = async () => {
     try {
+      toast.info("Logging out...", 1500);
       await logout();
+      toast.success("Logged out successfully. See you soon!", 3000);
     } catch (error) {
       console.error("Logout failed:", error);
+      toast.error("Logout failed. Please try again.", 4000);
     }
   };
 

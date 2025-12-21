@@ -106,7 +106,7 @@ export default function CreateFilmPage() {
       console.log("Submitting film data:", filmData);
       await api.post("/v2/films", filmData);
       
-      toast.success("Film created successfully!");
+      toast.success("🎬 Film created successfully! Redirecting to films...", 3000);
       setTimeout(() => {
         router.push("/films");
       }, 1000);

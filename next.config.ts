@@ -14,6 +14,34 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.imgur.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'imgur.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.imgur.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+      },
+      {
+        protocol: 'https',
         hostname: '**.googleapis.com',
       },
       {
@@ -29,10 +57,27 @@ const nextConfig: NextConfig = {
         hostname: 'res.cloudinary.com',
       },
       {
+        protocol: 'https',
+        hostname: '**.cloudinary.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'github.com',
+      },
+      {
         protocol: 'http',
         hostname: 'localhost',
       },
+      {
+        protocol: 'http',
+        hostname: '127.0.0.1',
+      },
     ],
+    unoptimized: process.env.NODE_ENV === 'development',
   },
 };
 

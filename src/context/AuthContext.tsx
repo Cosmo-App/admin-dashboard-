@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
@@ -24,6 +24,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [admin, setAdmin] = useState<Admin | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const fetchingRef = useRef(false); // Prevent concurrent fetches
+  const lastFetchRef = useRef<number>(0); // Track last fetch time
 
   // Check if token is expired
   const isTokenExpired = useCallback((token: string): boolean => {
@@ -36,8 +38,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Fetch current session
-  const fetchSession = useCallback(async () => {
+  // Fetch current session with caching
+  const fetchSession = useCallback(async (force: boolean = false) => {
+    // Prevent concurrent fetches
+    if (fetchingRef.current) return;
+    
+    // Cache for 30 seconds unless forced
+    const now = Date.now();
+    if (!force && now - lastFetchRef.current < 30000) {
+      setIsLoading(false);
+      return;
+    }
+
+    fetchingRef.current = true;
+    
     try {
       const token = Cookies.get(SESSION_COOKIE_NAME);
       
@@ -57,6 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response = await api.get<{ admin: Admin }>("/v2/auth/admin/session");
       if (response?.data?.admin) {
         setAdmin(response.data.admin);
+        lastFetchRef.current = now;
       } else {
         setAdmin(null);
         Cookies.remove(SESSION_COOKIE_NAME);
@@ -67,6 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       Cookies.remove(SESSION_COOKIE_NAME);
     } finally {
       setIsLoading(false);
+      fetchingRef.current = false;
     }
   }, [isTokenExpired]);
 
@@ -140,9 +156,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [router]);
 
-  // Refresh session (manual)
+  // Refresh session (manual) - force refetch
   const refreshSession = useCallback(async () => {
-    await fetchSession();
+    await fetchSession(true);
   }, [fetchSession]);
 
   // Update admin data (for profile updates)

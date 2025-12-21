@@ -61,27 +61,19 @@ export function CreatorAuthProvider({ children }: { children: React.ReactNode })
   // Fetch current session
   const fetchSession = useCallback(async () => {
     try {
-      console.log('[CreatorAuth] fetchSession called');
-      // Backend cookie is HttpOnly, so we can't check it here
-      // Just try to fetch the session and let the backend validate
-      
-      console.log('[CreatorAuth] Fetching session from backend...');
       const response = await api.get<{ creator: Creator }>("/v2/auth/creator/session");
-      console.log('[CreatorAuth] Session response:', response);
-      
-      // Backend wraps response in { message, data, success }
       const responseData = response.data;
       
       if (responseData?.creator) {
-        console.log('[CreatorAuth] Session found for:', responseData.creator.email);
         setCreator(responseData.creator);
       } else {
-        console.log('[CreatorAuth] No session found in response');
         setCreator(null);
       }
     } catch (error: any) {
-      console.error("[CreatorAuth] Failed to fetch creator session:", error);
-      console.log('[CreatorAuth] Error details:', error.response?.status, error.response?.data);
+      // Only log error if it's not a 401 (expected when not logged in)
+      if (error.response?.status !== 401) {
+        console.error("[CreatorAuth] Session fetch error:", error.response?.status);
+      }
       setCreator(null);
     } finally {
       setIsLoading(false);
@@ -91,34 +83,24 @@ export function CreatorAuthProvider({ children }: { children: React.ReactNode })
   // Login
   const login = useCallback(async (email: string, password: string) => {
     try {
-      console.log('[CreatorAuth] Attempting login for:', email);
       const response = await api.post<{ creator: Creator; token: string }>("/v2/auth/creator/login", { 
         email, 
         password 
       });
-
-      console.log('[CreatorAuth] Full login response:', response);
       
       if (!response || !response.data) {
         throw new Error("No response from server");
       }
       
-      // Backend wraps response in { message, data, success }
       const responseData = response.data;
-      console.log('[CreatorAuth] Parsed response data:', responseData);
       
       if (responseData?.creator && responseData?.token) {
-        console.log('[CreatorAuth] Setting creator:', responseData.creator.email);
-        // Backend sets HttpOnly cookie via Set-Cookie header
-        // We just update the state here
         setCreator(responseData.creator);
-        console.log('[CreatorAuth] Creator authenticated, cookie set by backend');
       } else {
-        console.error('[CreatorAuth] Invalid response structure:', responseData);
         throw new Error("Invalid response from server. Please try again.");
       }
     } catch (error: any) {
-      console.error("[CreatorAuth] Login failed:", error);
+      console.error("[CreatorAuth] Login failed:", error.response?.data?.message || error.message);
       throw error;
     }
   }, []);
@@ -126,31 +108,21 @@ export function CreatorAuthProvider({ children }: { children: React.ReactNode })
   // Register
   const register = useCallback(async (data: RegisterData) => {
     try {
-      console.log('[CreatorAuth] Attempting registration for:', data.email);
       const response = await api.post<{ creator: Creator; token: string }>("/v2/auth/creator/register", data);
-
-      console.log('[CreatorAuth] Full registration response:', response);
       
       if (!response || !response.data) {
         throw new Error("No response from server");
       }
       
-      // Backend wraps response in { message, data, success }
       const responseData = response.data;
-      console.log('[CreatorAuth] Parsed response data:', responseData);
       
       if (responseData?.creator && responseData?.token) {
-        console.log('[CreatorAuth] Setting creator:', responseData.creator.email);
-        // Backend sets HttpOnly cookie via Set-Cookie header
-        // We just update the state here
         setCreator(responseData.creator);
-        console.log('[CreatorAuth] Creator registered and authenticated, cookie set by backend');
       } else {
-        console.error('[CreatorAuth] Invalid response structure:', responseData);
         throw new Error("Invalid response from server. Please try again.");
       }
     } catch (error: any) {
-      console.error("[CreatorAuth] Registration failed:", error);
+      console.error("[CreatorAuth] Registration failed:", error.response?.data?.message || error.message);
       throw error;
     }
   }, []);

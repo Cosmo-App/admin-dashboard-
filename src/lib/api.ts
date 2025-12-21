@@ -25,8 +25,8 @@ const apiClient: AxiosInstance = axios.create({
  */
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Log requests in development
-    if (process.env.NODE_ENV === "development") {
+    // Log requests only in development and only in browser
+    if (process.env.NODE_ENV === "development" && typeof window !== "undefined") {
       console.log(`[API] ${config.method?.toUpperCase()} ${config.url}`);
     }
 
@@ -44,8 +44,8 @@ apiClient.interceptors.request.use(
  */
 apiClient.interceptors.response.use(
   (response) => {
-    // Log responses in development
-    if (process.env.NODE_ENV === "development") {
+    // Log responses only in development and only in browser
+    if (process.env.NODE_ENV === "development" && typeof window !== "undefined") {
       console.log(`[API] Response:`, response.data);
     }
 
@@ -57,7 +57,10 @@ apiClient.interceptors.response.use(
       const status = error.response.status;
       const data = error.response.data;
 
-      console.error(`[API] Error ${status}:`, data);
+      // Only log non-401 errors (401 is expected when not authenticated)
+      if (status !== 401) {
+        console.error(`[API] Error ${status}:`, data);
+      }
 
       // Handle 401 Unauthorized - redirect to appropriate login
       if (status === 401) {
@@ -88,15 +91,17 @@ apiClient.interceptors.response.use(
       // Network error (no response)
       console.error("[API] Network Error:", error.message);
       return Promise.reject({
-        message: "Network error. Please check your connection.",
+        message: "Unable to connect to the server. Please check your internet connection and try again.",
         code: "NETWORK_ERROR",
+        details: error.message,
       });
     } else {
       // Something else went wrong
       console.error("[API] Error:", error.message);
       return Promise.reject({
-        message: error.message || "An unexpected error occurred",
+        message: error.message || "An unexpected error occurred. Please try again.",
         code: "UNKNOWN_ERROR",
+        details: error,
       });
     }
   }
