@@ -150,8 +150,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error("Logout request failed:", error);
     } finally {
+      // Clear admin state
       setAdmin(null);
+      
+      // Remove cookie with proper options
+      Cookies.remove(SESSION_COOKIE_NAME, { 
+        path: '/',
+        domain: window.location.hostname === 'localhost' ? 'localhost' : undefined,
+        secure: window.location.protocol === 'https:',
+        sameSite: window.location.protocol === 'https:' ? 'strict' : 'lax'
+      });
+      
+      // Force clear from all possible paths/domains
       Cookies.remove(SESSION_COOKIE_NAME);
+      Cookies.remove(SESSION_COOKIE_NAME, { path: '/' });
+      
+      // Clear localStorage as backup
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('admin');
+        sessionStorage.clear();
+      }
+      
+      // Redirect to login
       router.push("/login");
     }
   }, [router]);
