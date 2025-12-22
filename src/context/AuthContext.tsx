@@ -99,7 +99,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const urlParams = new URLSearchParams(window.location.search);
         const redirectTo = urlParams.get('redirect') || '/dashboard';
         
-        router.push(redirectTo);
+        // Use hard redirect to ensure navigation happens
+        window.location.href = redirectTo;
       } else {
         console.error('[AuthContext] Invalid response structure:', response);
         throw new Error("Invalid response from server");
