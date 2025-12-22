@@ -22,6 +22,22 @@ export const COLORS = {
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
+// Log API configuration in development
+if (process.env.NODE_ENV === "development" && typeof window !== "undefined") {
+  console.log("[Config] API Base URL:", API_BASE_URL);
+}
+
+// Warn if using default localhost in production
+if (
+  typeof window !== "undefined" &&
+  process.env.NODE_ENV === "production" &&
+  API_BASE_URL.includes("localhost")
+) {
+  console.error(
+    "[Config] ⚠️ WARNING: Using localhost API URL in production! Set NEXT_PUBLIC_API_BASE_URL environment variable."
+  );
+}
+
 export const API_ENDPOINTS = {
   // Auth (v2 endpoints with JWT)
   LOGIN: "/v2/auth/admin/login",

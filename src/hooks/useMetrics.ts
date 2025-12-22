@@ -20,10 +20,15 @@ export function useMetrics(options: UseMetricsOptions = {}) {
     setError(null);
 
     try {
+      console.log("[useMetrics] Fetching metrics from:", "/v2/admin/metrics/overview");
       const response = await api.get<DashboardMetrics>("/v2/admin/metrics/overview");
+      console.log("[useMetrics] Response:", response);
+      
       if (response?.data) {
+        console.log("[useMetrics] Setting metrics:", response.data);
         setMetrics(response.data as DashboardMetrics);
       } else {
+        console.warn("[useMetrics] No data in response, using defaults");
         // Set default empty metrics if no data
         setMetrics({
           totalUsers: 0,
@@ -38,7 +43,12 @@ export function useMetrics(options: UseMetricsOptions = {}) {
         });
       }
     } catch (err: any) {
-      console.error("Failed to fetch metrics:", err);
+      console.error("[useMetrics] Failed to fetch metrics:", err);
+      console.error("[useMetrics] Error details:", {
+        message: err.message,
+        code: err.code,
+        details: err.details,
+      });
       setError(err.message || "Failed to fetch metrics");
       // Set default empty metrics on error to prevent breaking the UI
       setMetrics({
