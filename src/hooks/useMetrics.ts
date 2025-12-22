@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { api } from "@/lib/api";
 import { DashboardMetrics } from "@/types/models";
+import Cookies from "js-cookie";
+import { SESSION_COOKIE_NAME } from "@/lib/constants";
 
 interface UseMetricsOptions {
   autoFetch?: boolean;
@@ -16,6 +18,25 @@ export function useMetrics(options: UseMetricsOptions = {}) {
   const [error, setError] = useState<string | null>(null);
 
   const fetchMetrics = useCallback(async () => {
+    // Don't fetch if not authenticated
+    const token = Cookies.get(SESSION_COOKIE_NAME);
+    if (!token) {
+      console.warn("[useMetrics] No authentication token, skipping fetch");
+      setMetrics({
+        totalUsers: 0,
+        totalCreators: 0,
+        totalFilms: 0,
+        totalPlaylists: 0,
+        totalWatchTimeHours: 0,
+        avgWatchTimePerUser: 0,
+        userGrowth: 0,
+        filmGrowth: 0,
+        activeUsersLast30Days: 0,
+      });
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
