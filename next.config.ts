@@ -8,8 +8,6 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
-  // Set workspace root to avoid lockfile warnings
-  outputFileTracingRoot: require('path').join(__dirname, '../'),
   images: {
     remotePatterns: [
       {
