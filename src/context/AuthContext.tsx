@@ -56,22 +56,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Don't check for token client-side - httpOnly cookies can't be read by JS
       // Just try the API call, the cookie will be sent automatically with withCredentials
       
+      console.log('[AuthContext] Fetching session...');
+      console.log('[AuthContext] Cookies (visible to JS):', document.cookie);
+      
       const response = await api.get<{ admin: Admin }>("/v2/auth/admin/session");
+      
+      console.log('[AuthContext] Session response:', response);
+      
       if (response?.data?.admin) {
+        console.log('[AuthContext] Session found for:', response.data.admin.email);
         setAdmin(response.data.admin);
         lastFetchRef.current = now;
       } else {
+        console.log('[AuthContext] No admin in session response');
         setAdmin(null);
       }
     } catch (error: any) {
-      console.error("Failed to fetch session:", error);
+      console.error("[AuthContext] Failed to fetch session:", error);
+      console.error("[AuthContext] Error status:", error?.response?.status);
+      console.error("[AuthContext] Error data:", error?.response?.data);
       setAdmin(null);
       Cookies.remove(SESSION_COOKIE_NAME);
     } finally {
       setIsLoading(false);
       fetchingRef.current = false;
     }
-  }, [isTokenExpired]);
+  }, []);
 
   // Refresh token
   const refreshToken = useCallback(async () => {
@@ -92,16 +102,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = useCallback(async (email: string, password: string) => {
     try {
       console.log('[AuthContext] Attempting login for:', email);
+      console.log('[AuthContext] API Base URL:', process.env.NEXT_PUBLIC_API_BASE_URL);
+      console.log('[AuthContext] Current origin:', window.location.origin);
+      
       const response = await api.post<{ admin: Admin; token: string }>("/v2/auth/admin/login", { email, password });
       
       console.log('[AuthContext] Login response:', response);
-      console.log('[AuthContext] Response structure:', {
-        hasResponse: !!response,
-        hasData: !!response?.data,
-        hasAdmin: !!response?.data?.admin,
-        hasToken: !!response?.data?.token,
-        dataKeys: response?.data ? Object.keys(response.data) : [],
-      });
+      console.log('[AuthContext] Response headers:', response.headers);
+      console.log('[AuthContext] Set-Cookie header:', response.headers['set-cookie']);
 
       if (response?.data?.admin && response?.data?.token) {
         console.log('[AuthContext] Setting admin:', response.data.admin.email);
