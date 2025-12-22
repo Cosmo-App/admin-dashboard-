@@ -57,8 +57,8 @@ export default function CreateAdminPage() {
         ...data,
         profilePicture: profilePicture || undefined,
       });
-      toast.success("Admin created successfully!");
-      router.push("/admins");
+      toast.success("Admin created successfully!")
+      router.push("/admins")
     } catch (error: any) {
       console.error("Failed to create admin:", error);
       toast.error(error.response?.data?.error || "Failed to create admin");
