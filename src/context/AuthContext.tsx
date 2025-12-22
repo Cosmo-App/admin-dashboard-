@@ -53,28 +53,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     fetchingRef.current = true;
     
     try {
-      // Don't check for token client-side - httpOnly cookies can't be read by JS
-      // Just try the API call, the cookie will be sent automatically with withCredentials
-      
-      console.log('[AuthContext] Fetching session...');
-      console.log('[AuthContext] Cookies (visible to JS):', document.cookie);
-      
       const response = await api.get<{ admin: Admin }>("/v2/auth/admin/session");
       
-      console.log('[AuthContext] Session response:', response);
-      
       if (response?.data?.admin) {
-        console.log('[AuthContext] Session found for:', response.data.admin.email);
         setAdmin(response.data.admin);
         lastFetchRef.current = now;
       } else {
-        console.log('[AuthContext] No admin in session response');
         setAdmin(null);
       }
     } catch (error: any) {
-      console.error("[AuthContext] Failed to fetch session:", error);
-      console.error("[AuthContext] Error status:", error?.response?.status);
-      console.error("[AuthContext] Error data:", error?.response?.data);
       setAdmin(null);
       Cookies.remove(SESSION_COOKIE_NAME);
     } finally {
@@ -101,43 +88,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Login
   const login = useCallback(async (email: string, password: string) => {
     try {
-      console.log('[AuthContext] Attempting login for:', email);
-      console.log('[AuthContext] API Base URL:', process.env.NEXT_PUBLIC_API_BASE_URL);
-      console.log('[AuthContext] Current origin:', window.location.origin);
-      
       const response = await api.post<{ admin: Admin; token: string }>("/v2/auth/admin/login", { email, password });
-      
-      console.log('[AuthContext] Login response:', response);
-      console.log('[AuthContext] Response headers:', response?.headers);
-      console.log('[AuthContext] Set-Cookie header:', response?.headers?.['set-cookie']);
 
       if (response?.data?.admin && response?.data?.token) {
-        console.log('[AuthContext] Setting admin:', response.data.admin.email);
-        console.log('[AuthContext] Backend should have set cookie via Set-Cookie header');
-        console.log('[AuthContext] Cookies after login:', document.cookie);
         setAdmin(response.data.admin);
         
-        // DON'T set cookie client-side - backend already set it as httpOnly
-        // The browser will automatically include it in requests with withCredentials: true
+        // Backend sets httpOnly cookie - browser automatically includes it with withCredentials: true
         
         // Check for redirect parameter in URL
         const urlParams = new URLSearchParams(window.location.search);
         const redirectTo = urlParams.get('redirect') || '/dashboard';
         
-        console.log('[AuthContext] Login successful, redirecting to:', redirectTo);
         router.push(redirectTo);
       } else {
         console.error('[AuthContext] Invalid response structure:', response);
         throw new Error("Invalid response from server");
       }
     } catch (error: any) {
-      console.error("[AuthContext] Login failed:", error);
-      console.error("[AuthContext] Error details:", {
-        message: error?.message,
-        response: error?.response,
-        data: error?.response?.data,
-        hasDetails: !!error?.details,
-      });
       throw error;
     }
   }, [router]);
