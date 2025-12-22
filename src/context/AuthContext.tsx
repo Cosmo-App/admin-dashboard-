@@ -122,7 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Cookie is set by backend, but we can also set it client-side for immediate access
         Cookies.set(SESSION_COOKIE_NAME, response.data.token, {
           expires: 1, // 1 day
-          sameSite: "strict",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
           secure: process.env.NODE_ENV === "production",
         });
         console.log('[AuthContext] Login successful, redirecting to dashboard');
