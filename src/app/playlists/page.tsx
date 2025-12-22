@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/DashboardLayout";
 import DataTable, { Column } from "@/components/DataTable";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { api } from "@/lib/api";
 import { useToast } from "@/context/ToastContext";
 import { Playlist } from "@/types/models";
@@ -27,6 +28,14 @@ import ConfirmDialog from "@/components/ConfirmDialog";
 type PlaylistFilter = "all" | "public" | "private";
 
 export default function PlaylistsPage() {
+  return (
+    <ProtectedRoute>
+      <PlaylistsPageContent />
+    </ProtectedRoute>
+  );
+}
+
+function PlaylistsPageContent() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [filteredPlaylists, setFilteredPlaylists] = useState<Playlist[]>([]);
   const [isLoading, setIsLoading] = useState(true);

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
 import { User, Lock, Bell, Shield, Moon, Globe, Save } from "lucide-react";
@@ -10,6 +11,14 @@ import { api } from "@/lib/api";
 import { Admin } from "@/types/models";
 
 export default function SettingsPage() {
+  return (
+    <ProtectedRoute>
+      <SettingsPageContent />
+    </ProtectedRoute>
+  );
+}
+
+function SettingsPageContent() {
   const { admin, updateAdmin, isLoading: authLoading } = useAuth();
   const toast = useToast();
   const [activeTab, setActiveTab] = useState("general");

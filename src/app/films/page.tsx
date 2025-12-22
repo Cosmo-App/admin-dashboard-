@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/DashboardLayout";
 import DataTable from "@/components/DataTable";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { api } from "@/lib/api";
 import { Film } from "@/types/models";
 import { Plus, Eye, Edit, Trash, Film as FilmIcon, Power } from "lucide-react";
@@ -13,6 +14,14 @@ import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 
 export default function FilmsPage() {
+  return (
+    <ProtectedRoute>
+      <FilmsPageContent />
+    </ProtectedRoute>
+  );
+}
+
+function FilmsPageContent() {
   const [films, setFilms] = useState<Film[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; film: Film | null }>({

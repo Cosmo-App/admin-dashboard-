@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/DashboardLayout";
 import DataTable from "@/components/DataTable";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { api } from "@/lib/api";
 import { Admin } from "@/types/models";
 import { Eye, Edit, Trash, Plus, Shield, Users, CheckCircle, XCircle } from "lucide-react";
@@ -13,6 +14,14 @@ import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 
 export default function AdminsPage() {
+  return (
+    <ProtectedRoute>
+      <AdminsPageContent />
+    </ProtectedRoute>
+  );
+}
+
+function AdminsPageContent() {
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deleteDialog, setDeleteDialog] = useState(false);

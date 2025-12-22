@@ -4,6 +4,7 @@ import React from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import MetricCard from "@/components/MetricCard";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import {
   UserGrowthChart,
   FilmUploadsChart,
@@ -24,6 +25,14 @@ import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 
 export default function HomePage() {
+  return (
+    <ProtectedRoute>
+      <DashboardContent />
+    </ProtectedRoute>
+  );
+}
+
+function DashboardContent() {
   const { admin } = useAuth();
   const { metrics, isLoading: metricsLoading, refetch: refetchMetrics } = useMetrics({
     autoFetch: true,

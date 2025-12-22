@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "@/components/DashboardLayout";
 import DataTable from "@/components/DataTable";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { api } from "@/lib/api";
 import { User } from "@/types/models";
 import { Eye, Users, CheckCircle, Clock, UserX } from "lucide-react";
@@ -11,6 +12,14 @@ import { formatDateShort } from "@/lib/date";
 import Image from "next/image";
 
 export default function UsersPage() {
+  return (
+    <ProtectedRoute>
+      <UsersPageContent />
+    </ProtectedRoute>
+  );
+}
+
+function UsersPageContent() {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
