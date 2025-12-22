@@ -108,8 +108,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response = await api.post<{ admin: Admin; token: string }>("/v2/auth/admin/login", { email, password });
       
       console.log('[AuthContext] Login response:', response);
-      console.log('[AuthContext] Response headers:', response.headers);
-      console.log('[AuthContext] Set-Cookie header:', response.headers['set-cookie']);
+      console.log('[AuthContext] Response headers:', response?.headers);
+      console.log('[AuthContext] Set-Cookie header:', response?.headers?.['set-cookie']);
 
       if (response?.data?.admin && response?.data?.token) {
         console.log('[AuthContext] Setting admin:', response.data.admin.email);
