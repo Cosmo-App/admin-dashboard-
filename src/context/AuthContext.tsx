@@ -145,26 +145,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Logout
   const logout = useCallback(async () => {
+    // Clear client-side state and cookies FIRST
+    setAdmin(null);
+    
+    // Clear cookie with all possible configurations to ensure removal
+    Cookies.remove(SESSION_COOKIE_NAME);
+    Cookies.remove(SESSION_COOKIE_NAME, { path: '/' });
+    Cookies.remove(SESSION_COOKIE_NAME, { path: '/', domain: window.location.hostname });
+    
+    // Also clear from document.cookie as fallback
+    document.cookie = `${SESSION_COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    
     try {
-      // Call backend logout to clear server-side cookie
+      // Call backend logout to clear server-side cookie (non-blocking)
       await api.post("/v2/auth/admin/logout");
     } catch (error) {
       console.error("Logout request failed:", error);
-    } finally {
-      // Clear client-side state and cookies
-      setAdmin(null);
-      
-      // Clear cookie with all possible configurations to ensure removal
-      Cookies.remove(SESSION_COOKIE_NAME);
-      Cookies.remove(SESSION_COOKIE_NAME, { path: '/' });
-      Cookies.remove(SESSION_COOKIE_NAME, { path: '/', domain: window.location.hostname });
-      
-      // Also clear from document.cookie as fallback
-      document.cookie = `${SESSION_COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-      
-      // Force redirect to login
-      window.location.href = "/login";
     }
+    
+    // Small delay to ensure cookies are cleared before redirect
+    setTimeout(() => {
+      window.location.href = "/login";
+    }, 100);
   }, []);
 
   // Refresh session (manual) - force refetch
