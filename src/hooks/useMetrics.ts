@@ -52,57 +52,15 @@ export function useMetrics(options: UseMetricsOptions = {}) {
   const [error, setError] = useState<string | null>(null);
 
   const fetchMetrics = useCallback(async () => {
-    // Don't fetch if not authenticated
-    console.log("[useMetrics] fetchMetrics called");
-    console.log("[useMetrics] typeof window:", typeof window);
-    console.log("[useMetrics] typeof document:", typeof document);
-    
-    // Ensure we're on client side
-    if (typeof window === "undefined") {
-      console.warn("[useMetrics] Running on server side, skipping fetch");
-      setIsLoading(false);
-      return;
-    }
-    
-    const token = Cookies.get(SESSION_COOKIE_NAME);
-    console.log("[useMetrics] Starting fetch - Token present:", !!token, "Cookie name:", SESSION_COOKIE_NAME);
-    console.log("[useMetrics] All cookies:", document.cookie);
-    
-    if (!token) {
-      console.warn("[useMetrics] ❌ No authentication token found, skipping fetch");
-      console.warn("[useMetrics] Expected cookie name:", SESSION_COOKIE_NAME);
-      setMetrics({
-        totalUsers: 0,
-        totalCreators: 0,
-        totalFilms: 0,
-        totalPlaylists: 0,
-        totalWatchTimeHours: 0,
-        avgWatchTimePerUser: 0,
-        userGrowth: 0,
-        filmGrowth: 0,
-        activeUsersLast30Days: 0,
-      });
-      setIsLoading(false);
-      return;
-    }
-
     setIsLoading(true);
     setError(null);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-      console.log("[useMetrics] ✅ Token found, fetching metrics");
-      console.log("[useMetrics] API Base URL:", apiUrl);
-      console.log("[useMetrics] Full URL:", `${apiUrl}/v2/admin/metrics/overview`);
-      
       const response = await api.get<DashboardMetrics>("/v2/admin/metrics/overview");
-      console.log("[useMetrics] ✅ Response received:", response);
       
       if (response?.data) {
-        console.log("[useMetrics] Setting metrics:", response.data);
         setMetrics(response.data as DashboardMetrics);
       } else {
-        console.warn("[useMetrics] No data in response, using defaults");
         // Set default empty metrics if no data
         setMetrics({
           totalUsers: 0,
@@ -144,9 +102,7 @@ export function useMetrics(options: UseMetricsOptions = {}) {
   }, []);
 
   useEffect(() => {
-    console.log("[useMetrics] useEffect triggered - autoFetch:", autoFetch);
     if (autoFetch) {
-      console.log("[useMetrics] Calling fetchMetrics...");
       fetchMetrics();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
