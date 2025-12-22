@@ -5,6 +5,40 @@ import { api } from "@/lib/api";
 import { DashboardMetrics } from "@/types/models";
 import Cookies from "js-cookie";
 import { SESSION_COOKIE_NAME } from "@/lib/constants";
+import { AxiosError } from "axios";
+
+// Helper to extract meaningful error messages
+function getErrorMessage(error: any, fallback: string): string {
+  if (!error) return fallback;
+  
+  // Axios error with response
+  if (error.response?.data?.message) {
+    return error.response.data.message;
+  }
+  
+  // Axios error with status text
+  if (error.response?.statusText) {
+    return `${error.response.statusText} (${error.response.status})`;
+  }
+  
+  // Network error
+  if (error.code === 'ERR_NETWORK') {
+    return 'Network error - Unable to connect to server';
+  }
+  
+  // Timeout error
+  if (error.code === 'ECONNABORTED') {
+    return 'Request timeout - Server took too long to respond';
+  }
+  
+  // Standard error message
+  if (error.message) {
+    return error.message;
+  }
+  
+  // Fallback
+  return fallback;
+}
 
 interface UseMetricsOptions {
   autoFetch?: boolean;
@@ -64,13 +98,15 @@ export function useMetrics(options: UseMetricsOptions = {}) {
         });
       }
     } catch (err: any) {
-      console.error("[useMetrics] Failed to fetch metrics:", err);
-      console.error("[useMetrics] Error details:", {
-        message: err.message,
-        code: err.code,
-        details: err.details,
+      const errorMessage = getErrorMessage(err, "Failed to fetch metrics");
+      console.error("[useMetrics] Failed to fetch metrics:", {
+        error: err,
+        message: errorMessage,
+        response: err?.response?.data,
+        status: err?.response?.status,
+        code: err?.code,
       });
-      setError(err.message || "Failed to fetch metrics");
+      setError(errorMessage);
       // Set default empty metrics on error to prevent breaking the UI
       setMetrics({
         totalUsers: 0,
@@ -126,8 +162,14 @@ export function useUserGrowth(days: number = 30) {
         setData(response.data as any[]);
       }
     } catch (err: any) {
-      console.error("Failed to fetch user growth:", err);
-      setError(err.message || "Failed to fetch user growth data");
+      const errorMessage = getErrorMessage(err, "Failed to fetch user growth data");
+      console.error("Failed to fetch user growth:", {
+        error: err,
+        message: errorMessage,
+        response: err?.response?.data,
+        status: err?.response?.status,
+      });
+      setError(errorMessage);
       // Set empty array to prevent UI breakage
       setData([]);
     } finally {
@@ -158,8 +200,14 @@ export function useFilmUploads(months: number = 6) {
         setData(response.data as any[]);
       }
     } catch (err: any) {
-      console.error("Failed to fetch film uploads:", err);
-      setError(err.message || "Failed to fetch film upload data");
+      const errorMessage = getErrorMessage(err, "Failed to fetch film upload data");
+      console.error("Failed to fetch film uploads:", {
+        error: err,
+        message: errorMessage,
+        response: err?.response?.data,
+        status: err?.response?.status,
+      });
+      setError(errorMessage);
       // Set empty array to prevent UI breakage
       setData([]);
     } finally {
@@ -190,8 +238,14 @@ export function usePopularFilms(limit: number = 10) {
         setFilms(response.data as any[]);
       }
     } catch (err: any) {
-      console.error("Failed to fetch popular films:", err);
-      setError(err.message || "Failed to fetch popular films");
+      const errorMessage = getErrorMessage(err, "Failed to fetch popular films");
+      console.error("Failed to fetch popular films:", {
+        error: err,
+        message: errorMessage,
+        response: err?.response?.data,
+        status: err?.response?.status,
+      });
+      setError(errorMessage);
       // Return empty array on error to prevent UI breakage
       setFilms([]);
     } finally {
@@ -222,8 +276,14 @@ export function useGenreDistribution() {
         setData(response.data as any[]);
       }
     } catch (err: any) {
-      console.error("Failed to fetch genre distribution:", err);
-      setError(err.message || "Failed to fetch genre distribution");
+      const errorMessage = getErrorMessage(err, "Failed to fetch genre distribution");
+      console.error("Failed to fetch genre distribution:", {
+        error: err,
+        message: errorMessage,
+        response: err?.response?.data,
+        status: err?.response?.status,
+      });
+      setError(errorMessage);
       // Set empty array to prevent UI breakage
       setData([]);
     } finally {
@@ -254,8 +314,14 @@ export function useRecentActivities(limit: number = 10) {
         setActivities(response.data as any[]);
       }
     } catch (err: any) {
-      console.error("Failed to fetch activities:", err);
-      setError(err.message || "Failed to fetch activities");
+      const errorMessage = getErrorMessage(err, "Failed to fetch activities");
+      console.error("Failed to fetch activities:", {
+        error: err,
+        message: errorMessage,
+        response: err?.response?.data,
+        status: err?.response?.status,
+      });
+      setError(errorMessage);
       // Set empty array to prevent UI breakage
       setActivities([]);
     } finally {
