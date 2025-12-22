@@ -146,35 +146,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Logout
   const logout = useCallback(async () => {
     try {
+      // Call backend logout to clear server-side cookie
       await api.post("/v2/auth/admin/logout");
     } catch (error) {
       console.error("Logout request failed:", error);
     } finally {
-      // Clear admin state
+      // Clear client-side state and cookies
       setAdmin(null);
       
-      // Remove cookie with proper options
-      Cookies.remove(SESSION_COOKIE_NAME, { 
-        path: '/',
-        domain: window.location.hostname === 'localhost' ? 'localhost' : undefined,
-        secure: window.location.protocol === 'https:',
-        sameSite: window.location.protocol === 'https:' ? 'strict' : 'lax'
-      });
-      
-      // Force clear from all possible paths/domains
+      // Clear cookie with all possible configurations to ensure removal
       Cookies.remove(SESSION_COOKIE_NAME);
       Cookies.remove(SESSION_COOKIE_NAME, { path: '/' });
+      Cookies.remove(SESSION_COOKIE_NAME, { path: '/', domain: window.location.hostname });
       
-      // Clear localStorage as backup
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('admin');
-        sessionStorage.clear();
-      }
+      // Also clear from document.cookie as fallback
+      document.cookie = `${SESSION_COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
       
-      // Redirect to login
-      router.push("/login");
+      // Force redirect to login
+      window.location.href = "/login";
     }
-  }, [router]);
+  }, []);
 
   // Refresh session (manual) - force refetch
   const refreshSession = useCallback(async () => {
