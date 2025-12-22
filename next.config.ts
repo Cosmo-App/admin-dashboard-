@@ -2,10 +2,14 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  reactCompiler: true,
   // Optimize for production
   compress: true,
   poweredByHeader: false,
+  experimental: {
+    optimizePackageImports: ['lucide-react'],
+  },
+  // Set workspace root to avoid lockfile warnings
+  outputFileTracingRoot: require('path').join(__dirname, '../'),
   images: {
     remotePatterns: [
       {

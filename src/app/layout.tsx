@@ -18,7 +18,11 @@ const sora = Sora({
 export const metadata: Metadata = {
   title: "Cosmic Admin Dashboard",
   description: "Admin dashboard for Cosmic streaming platform",
-  viewport: "width=device-width, initial-scale=1",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
   themeColor: "#E50914",
 };
 
