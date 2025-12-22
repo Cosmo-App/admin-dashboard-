@@ -120,8 +120,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // DON'T set cookie client-side - backend already set it as httpOnly
         // The browser will automatically include it in requests with withCredentials: true
         
-        console.log('[AuthContext] Login successful, redirecting to dashboard');
-        router.push("/");
+        // Check for redirect parameter in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectTo = urlParams.get('redirect') || '/dashboard';
+        
+        console.log('[AuthContext] Login successful, redirecting to:', redirectTo);
+        router.push(redirectTo);
       } else {
         console.error('[AuthContext] Invalid response structure:', response);
         throw new Error("Invalid response from server");
