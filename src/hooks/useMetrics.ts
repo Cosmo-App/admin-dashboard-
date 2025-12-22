@@ -71,14 +71,16 @@ export function useMetrics(options: UseMetricsOptions = {}) {
     if (autoFetch) {
       fetchMetrics();
     }
-  }, [autoFetch, fetchMetrics]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoFetch]);
 
   useEffect(() => {
     if (interval && interval > 0) {
       const timer = setInterval(fetchMetrics, interval);
       return () => clearInterval(timer);
     }
-  }, [interval, fetchMetrics]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [interval]);
 
   return {
     metrics,
@@ -114,7 +116,8 @@ export function useUserGrowth(days: number = 30) {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [days]);
 
   return { data, isLoading, error, refetch: fetchData };
 }
@@ -145,7 +148,8 @@ export function useFilmUploads(months: number = 6) {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [months]);
 
   return { data, isLoading, error, refetch: fetchData };
 }
@@ -176,7 +180,8 @@ export function usePopularFilms(limit: number = 10) {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [limit]);
 
   return { films, isLoading, error, refetch: fetchData };
 }
@@ -207,7 +212,8 @@ export function useGenreDistribution() {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return { data, isLoading, error, refetch: fetchData };
 }
@@ -238,7 +244,8 @@ export function useRecentActivities(limit: number = 10) {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [limit]);
 
   return { activities, isLoading, error, refetch: fetchData };
 }
